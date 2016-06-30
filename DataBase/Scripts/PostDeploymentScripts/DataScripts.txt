@@ -1,0 +1,32 @@
+1. Insert data into table if particular records are not exists
+
+		;WITH cte_Taskstatus
+		AS
+		(
+		SELECT  'Scheduled' Taskstatustext,'Scheduled' Description,1 CreatedByUserid,1 IsActive union
+		SELECT  'Open','Open','1',1 union
+		SELECT  'Closed Complete','Closed Complete',1,1 
+		)
+		INSERT INTO TaskStatus(TaskStatusText,Description,CreatedByUserId,IsActive)
+		SELECT * FROM cte_Taskstatus WHERE NOT EXISTS (SELECT 1 FROM TaskStatus e WHERE e.TaskStatusText = cte_Taskstatus.TaskStatusText)
+		GO
+
+2.	If table is empty then insert data
+		IF NOT EXISTS (SELECT 1 FROM Pat_Y )
+		BEGIN
+		SET IDENTITY_INSERT Pat_Y ON
+		INSERT INTO Pat_Y (pid,name)
+		SELECT
+			TOP 10 PatientID,FirstName
+			FROM Patient
+		
+		SET IDENTITY_INSERT Pat_Y OFF
+		END
+		GO
+
+3.	If data is exists then update
+		IF EXISTS (SELECT 1 FROM PopulationDefPanelConfiguration WHERE PanelorGroupName =' ICD-9-CM-Proc'AND PopulationType='Population')
+		BEGIN
+		UPDATE PopulationDefPanelConfiguration SET PanelorGroupName ='ICD-10-CM-Proc' where PopulationType='Population' and PanelorGroupName ='ICD-9-CM-Proc'
+		END
+		GO

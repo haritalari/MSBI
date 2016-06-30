@@ -1,0 +1,26 @@
+1. If Index Not Exists then create
+
+	IF NOT EXISTS (SELECT NAME FROM sys.indexes	WHERE NAME = N'IX_Index_Name')
+	BEGIN
+		CREATE CLUSTERED INDEX IX_Index_Name ON TableName (ColumnName)
+	END
+	GO
+	
+2. If index exists than drop
+
+	IF EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Task_TaskDueDate' AND OBJECT_NAME(OBJECT_ID) = 'Task')
+	BEGIN
+		DROP INDEX [IX_Task_TaskDueDate] ON Task
+	END
+	GO
+
+3. Rename index if exists
+	IF EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_PatientID_PatientInsurance' AND OBJECT_NAME(OBJECT_ID) = 'PatientInsurance')
+	BEGIN
+		IF EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_PatientInsurance_PatientID_PIID' AND OBJECT_NAME(OBJECT_ID) = 'PatientInsurance')
+		BEGIN
+			DROP INDEX [IX_PatientInsurance_PatientID_PIID] ON PatientInsurance
+		END
+		EXEC sp_rename N'dbo.PatientInsurance.IX_PatientID_PatientInsurance', N'IX_PatientInsurance_PatientID_PIID', N'INDEX';
+	END
+	GO
