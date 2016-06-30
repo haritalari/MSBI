@@ -1,0 +1,10 @@
+IF EXISTS (
+		SELECT *
+		FROM sys.columns
+		WHERE NAME = N'columnName'
+			AND Object_ID = Object_ID(N'PopulationDefinitionConfiguration')
+		)
+BEGIN
+	ALTER TABLE PopulationDefinitionConfiguration DROP COLUMN column_name
+END
+
