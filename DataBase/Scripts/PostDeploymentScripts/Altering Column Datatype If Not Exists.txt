@@ -1,0 +1,14 @@
+1.	Altering Column datatype if not existsAltering Column datatype if not exists
+		IF NOT EXISTS (
+				SELECT 1
+				FROM sys.columns c
+				INNER JOIN sys.types t ON c.user_type_id = t.user_type_id
+				WHERE c.object_id = OBJECT_ID('PatientDemographicHistory')
+					AND c.NAME = 'DateOfBirth'
+					AND t.NAME = 'DATETIME'
+				)
+		BEGIN
+			ALTER TABLE PatientDemographicHistory ALTER COLUMN DateOfBirth DATETIME
+		END
+		GO
+		
