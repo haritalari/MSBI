@@ -1,0 +1,6 @@
+SELECT objtype
+	,objname
+	,NAME
+	,value
+FROM fn_listextendedproperty(NULL, 'schema', 'dbo', 'table', DEFAULT, NULL, NULL);
+GO
