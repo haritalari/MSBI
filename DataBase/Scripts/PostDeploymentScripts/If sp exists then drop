@@ -1,0 +1,6 @@
+ IF EXISTS( SELECT * FROM sys.procedures WHERE NAME IN( 'usp_User_Insert'))
+ BEGIN
+    DROP PROC usp_User_Insert
+ END
+ GO
+ 
