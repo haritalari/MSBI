@@ -1,0 +1,200 @@
+cd D:
+
+ls (it displays the list of files in present folder)
+mkdir <folder_name> (it create a new folder_name)
+pws (it shows the present working directory)
+rmdir <folder_name> (it removes the folder )
+cd .. (it goes to one folder back)
+
+
+Step1:- git init <project> ( project new repository)
+Step2:- git add . (add all files to staging) 	
+Step3:- git commit -m "message" (Snapshot)
+
+		git status (status of files)
+		git log (commit history)		
+		git log --oneline (shortcut)
+		git diff (view differences)
+		git diff --cached (differences in staging)
+
+
+cd D:
+cd GITHUB
+git config --global user.name "yugandhar-t-ext"
+git config --global user.email "yugandhar.t-ext@influencehealth.com"
+git clone (http_url (or) ssh_url)
+git checkout [branch_name]
+git pull
+git status
+git add -A
+git stash (Temporarily stores all modified tracked files)
+git commit -m 'comment_message'
+git add [filename] -f (for force pushing)
+git push
+git merge origin/[branch]  ( Combines the specified branch’s history into the current branch)
+git branch –d [branch-name] (To remove a local branch from your machine)
+git push origin :[branch-name] (To remove a remote branch from the server)
+git config user.name (checking user name)
+
+
+
+
+Pushing Post Deployment Script
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. checkout the branch and pull the latest data into github
+2. write the query and save it scripts under navigate database
+3. add the script name under Script.PostDeployment with extension(.sql) 
+	example: -   	:r .\DropUniqueIndex.sql 
+4. open the navigate solution explorer in 2012 version
+5. In navigate solution explorer select the scripts and select object and change the properties Build Action -> to none
+6. Rebuild the Navigate the database and close it
+7. jump to git bash and type the (git status)  and see the changes
+8. after the add to the staging by using the command  (git add -A)
+9. git status
+10. git commit -m 'message'
+11. git push
+12. git reset --merge
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Generating SSH keys
+
+Step 1: Check for SSH keys
+
+First, we need to check for existing SSH keys on your computer. Open Git Bash and enter:
+
+ls -al ~/.ssh (Lists the files in your .ssh directory, if they exist)
+ssh-keygen -t rsa -b 4096 -C "yugandhar.t-ext@influencehealth.com"
+
+Step 2: Generate a new SSH key
+
+    With Git Bash still open, copy and paste the text below. Make sure you substitute in your GitHub email address.
+
+    ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+    # Creates a new ssh key, using the provided email as a label
+    # Generating public/private rsa key pair.
+
+    We strongly suggest keeping the default settings as they are, so when you're prompted to "Enter a file in which to save the key", just press Enter to continue.
+
+    # Enter file in which to save the key (/Users/you/.ssh/id_rsa): [Press enter]
+
+    You'll be asked to enter a passphrase.
+
+    # Enter passphrase (empty for no passphrase): [Type a passphrase]
+    # Enter same passphrase again: [Type passphrase again]
+
+    After you enter a passphrase, you'll be given the fingerprint, or id, of your SSH key. It will look something like this:
+
+    # Your identification has been saved in /Users/you/.ssh/id_rsa.
+    # Your public key has been saved in /Users/you/.ssh/id_rsa.pub.
+    # The key fingerprint is:
+    # 01:0f:f4:3b:ca:85:d6:17:a1:7d:f0:68:9d:f0:a2:db your_email@example.com
+
+Step 3: Add your key to the ssh-agent
+
+To configure the ssh-agent program to use your SSH key:
+
+If you have GitHub for Windows installed, you can use it to clone repositories and not deal with SSH keys. It also comes with the Git Bash tool, 
+which is the preferred way of running git commands on Windows.
+
+    Ensure ssh-agent is enabled:
+
+        If you are using Git Bash, turn on ssh-agent:
+
+        # start the ssh-agent in the background
+        ssh-agent -s
+        # Agent pid 59566
+
+        If you are using another terminal prompt, such as msysgit, turn on ssh-agent:
+
+        # start the ssh-agent in the background
+        eval $(ssh-agent -s)
+        # Agent pid 59566
+
+    Add your SSH key to the ssh-agent:
+
+    ssh-add ~/.ssh/id_rsa
+
+Tip: If you didn't generate a new SSH key in Step 2, and used an existing SSH key instead, you will need to replace id_rsa 
+in the above command with the name of your existing private key file.
+
+Step 4: Add your SSH key to your account
+
+To configure your GitHub account to use your SSH key:
+
+Copy the SSH key to your clipboard. If your key is named id_dsa.pub, id_ecdsa.pub or id_ed25519.pub, then change the filename below from id_rsa.pub to the one that matches your key:
+
+clip < ~/.ssh/id_rsa.pub
+# Copies the contents of the id_rsa.pub file to your clipboard
+
+Warning: It's important to copy the key exactly without adding newlines or whitespace.
+
+ADD THE COPIED KEY TO GITHUB:
+
+    Settings icon in the user barIn the top right corner of any page, click your profile photo, then click Settings.
+
+    SSH keysIn the user settings sidebar, click SSH keys.
+
+    SSH Key buttonClick Add SSH key.
+    In the Title field, add a descriptive label for the new key. For example, if you're using a personal Mac, you might call this key "Personal MacBook Air".
+    The key fieldPaste your key into the "Key" field.
+    The Add key buttonClick Add key.
+    Confirm the action by entering your GitHub password.
+
+Step 5: Test the connection
+
+To make sure everything is working, you'll now try to SSH into GitHub. When you do this, you will be asked to authenticate this action using your password, 
+which is the SSH key passphrase you created earlier.
+
+    Open Git Bash and enter:
+
+    ssh -T git@github.com
+    # Attempts to ssh to GitHub
+
+    You may see this warning:
+
+    # The authenticity of host 'github.com (207.97.227.239)' can't be established.
+    # RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
+    # Are you sure you want to continue connecting (yes/no)?
+
+    Verify the fingerprint in the message you see matches the following message, then type yes:
+
+    # Hi username! You've successfully authenticated, but GitHub does not
+    # provide shell access.
+
+    If the username in the message is yours, you've successfully set up your SSH key!
+
+    If you receive a message about "access denied," you can read these instructions for diagnosing the issue.
+
+    If you're switching from HTTPS to SSH, you'll now need to update your remote repository URLs. For more information, see Changing a remote's URL.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+How To GitHub change commit message
+		1)Clone the repo to your machine.
+			#git clone https://github.com/sajuptpm/tools.git
+		2)Find ID of the commit which comes just before the commit for which you want to change the message.
+			You can use the command "#git log -n 10" for that.
+		3)Then use this command:
+			#git rebase -i commit_id
+		Your text editor will open with a file that lists all the commits which come after your selected commit_id, and in front of each commit there is the word "pick".
+		The commit for which you want to change the commit message, change "pick" to "reword" and save it.
+		Then a new file should pop up in your editor.There you can change the commit message and save it
+		4)Force-push to remote repo.
+			#git push -f origin master
+		5)Check github. It should be updated.
+
+
+How To GitHub delete a commit
+		1)Clone the repo to your machine.
+			#git clone https://github.com/sajuptpm/tools.git
+		2)Find ID of the commit which comes just before the commit which you want to delete.
+			You can use the command "#git log -n 10" for that.
+		3)Then use this command:
+			#git rebase -i commit_id
+		Your text editor will open with a file that lists all the commits which come after your selected commit_id, and in front of each commit there is the word "pick".
+		In that list remove the commit which you want to delete and save it.
+		4)Force-push to remote repo.
+			#git push -f origin master
+		5)Check github. It should be updated		
+		
