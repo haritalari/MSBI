@@ -1,1 +1,2 @@
 
+1. Use SET NOCOUNT ON at the top of each stored procedure and SET NOCOUNT OFF at the bottom.
