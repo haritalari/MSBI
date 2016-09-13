@@ -1,3 +1,4 @@
 
 1. Use SET NOCOUNT ON at the top of each stored procedure and SET NOCOUNT OFF at the bottom.
 2. Use CHARINDEX instead of LIKE for search string
+3. Use table varible for less data, for more data use temp tables
