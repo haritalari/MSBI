@@ -1,2 +1,3 @@
 
 1. Use SET NOCOUNT ON at the top of each stored procedure and SET NOCOUNT OFF at the bottom.
+2. Use CHARINDEX instead of LIKE for search string
