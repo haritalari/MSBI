@@ -1,0 +1,5 @@
+
+1. How to check QUOTED_IDENTIFIER is ON/OFF
+    SELECT OBJECT_NAME(object_id)
+    FROM sys.sql_modules
+    WHERE uses_quoted_identifier = 0 -- 0 means OFF and 1 means ON
