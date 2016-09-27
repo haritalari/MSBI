@@ -1,4 +1,12 @@
+1. SET NOCOUNT ON/OFF
+    Stops the message that shows the count of the number of rows affected by a Transact-SQL statement or stored procedure 
+    from being returned as part of the result set.
+    
+    When SET NOCOUNT is ON, the count is not returned. When SET NOCOUNT is OFF, the count is returned.
+    
+    The @@ROWCOUNT function is updated even when SET NOCOUNT is ON.
 
-1. Use SET NOCOUNT ON at the top of each stored procedure and SET NOCOUNT OFF at the bottom.
-2. Use CHARINDEX instead of LIKE for search string
-3. Use table varible for less data, for more data use temp tables
+    SET NOCOUNT ON prevents the sending of DONE_IN_PROC messages to the client for each statement in a stored procedure. 
+    For stored procedures that contain several statements that do not return much actual data, or for procedures that contain Transact-SQL 
+    loops, setting SET NOCOUNT to ON can provide a significant performance boost, because network traffic is greatly reduced. 
+    The setting specified by SET NOCOUNT is in effect at execute or run time and not at parse time.
