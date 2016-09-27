@@ -7,6 +7,62 @@
     The @@ROWCOUNT function is updated even when SET NOCOUNT is ON.
 
     SET NOCOUNT ON prevents the sending of DONE_IN_PROC messages to the client for each statement in a stored procedure. 
-    For stored procedures that contain several statements that do not return much actual data, or for procedures that contain Transact-SQL 
-    loops, setting SET NOCOUNT to ON can provide a significant performance boost, because network traffic is greatly reduced. 
-    The setting specified by SET NOCOUNT is in effect at execute or run time and not at parse time.
+    For stored procedures that contain several statements that do not return much actual data, or for procedures that contain 
+    Transact-SQL loops, setting SET NOCOUNT to ON can provide a significant performance boost,because network traffic 
+    is greatly reduced. The setting specified by SET NOCOUNT is in effect at execute or run time and not at parse time.
+    
+    For Example:-
+    
+    USE AdventureWorks2012;  
+    GO  
+    SET NOCOUNT OFF;  
+    GO  
+    -- Display the count message.  
+    SELECT TOP(5)LastName FROM Person.Person  WHERE LastName LIKE 'A%';  
+    GO  
+    -- SET NOCOUNT to ON to no longer display the count message.  
+    SET NOCOUNT ON;  
+    GO  
+    SELECT TOP(5) LastName  FROM Person.Person  WHERE LastName LIKE 'A%';  
+    GO  
+    -- Reset SET NOCOUNT to OFF  
+    SET NOCOUNT OFF;  
+    GO 
+------------------------------------------------------------------------------------------------------------------------------------    
+ 2. SET ANSI_NULL ON/OFF
+    -- Create table t1 and insert values.  
+    CREATE TABLE dbo.t1 (a INT NULL);  
+    INSERT INTO dbo.t1 values (NULL),(0),(1);  
+    GO  
+    -- Print message and perform SELECT statements.  
+    PRINT 'Testing default setting';  
+    DECLARE @varname int;   
+    SET @varname = NULL;  
+  
+    SELECT a FROM t1 WHERE a = @varname;  
+    SELECT a FROM t1 WHERE a <> @varname;  
+    SELECT a FROM t1 WHERE a IS NULL;  
+    GO  
+  -- SET ANSI_NULLS to ON and test.  
+    PRINT 'Testing ANSI_NULLS ON';  
+    SET ANSI_NULLS ON;  
+    GO  
+    DECLARE @varname int;  
+    SET @varname = NULL  
+  
+    SELECT a FROM t1 WHERE a = @varname;  
+    SELECT a FROM t1 WHERE a <> @varname;  
+    SELECT a FROM t1 WHERE a IS NULL;  
+    GO  
+ -- SET ANSI_NULLS to OFF and test.  
+    PRINT 'Testing SET ANSI_NULLS OFF';  
+    SET ANSI_NULLS OFF;  
+    GO  
+    DECLARE @varname int;  
+    SET @varname = NULL;  
+    SELECT a FROM t1 WHERE a = @varname;  
+    SELECT a FROM t1 WHERE a <> @varname;  
+    SELECT a FROM t1 WHERE a IS NULL;  
+    GO  
+-- Drop table t1.  
+    DROP TABLE dbo.t1; 
