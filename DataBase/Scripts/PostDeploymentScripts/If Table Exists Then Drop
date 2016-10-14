@@ -1,5 +1,0 @@
---If Table Exists Then Drop
-	IF Exists(SELECT * FROM sys.objects WHERE NAME = 'Table_Name')
-	BEGIN
-		Drop Table Table_Name
-	END
