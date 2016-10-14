@@ -1,0 +1,29 @@
+--Finding Column Dependent Objects
+--http://dba.stackexchange.com/questions/60961/find-which-objects-are-using-my-table-column-in-the-given-schema
+DECLARE @q VARCHAR(30) = 'AccessType'
+
+SELECT DISTINCT o.NAME AS Object_Name
+	,o.type_desc AS 'Type'
+	,m.DEFINITION AS 'Complete Name'
+FROM sys.sql_modules m
+INNER JOIN sys.objects o ON m.object_id = o.object_id
+WHERE m.DEFINITION LIKE '%' + @q + '%'
+
+UNION ALL
+
+SELECT t.NAME AS Object_Name
+	,'Table' AS 'Type'
+	,c.NAME AS 'Complete Name'
+FROM sys.tables AS t
+INNER JOIN sys.columns c ON t.OBJECT_ID = c.OBJECT_ID
+WHERE c.NAME LIKE '%' + @q + '%'
+
+UNION ALL
+
+SELECT OBJECT_NAME(id) AS Object_Name
+	,'Trigger' AS 'Type'
+	,TEXT AS 'Complete Name'
+FROM syscomments
+WHERE [text] LIKE '%' + @q + '%'
+	AND OBJECTPROPERTY(id, 'IsTrigger') = 1
+ORDER BY 2,1,3;
