@@ -1,0 +1,26 @@
+-----Find Depndent Object For given table based on column Wise
+    DECLARE @tableName VARCHAR(64);
+
+    SET @tableName = 'Patient';
+
+    SELECT SO_P.NAME AS [parent table]
+      ,SC_P.NAME AS [parent column]
+      ,'is a foreign key of' AS [direction]
+      ,SO_R.NAME AS [referenced table]
+      ,SC_R.NAME AS [referenced column]
+      ,*
+    FROM sys.foreign_key_columns FKC
+    INNER JOIN sys.objects SO_P ON SO_P.object_id = FKC.parent_object_id
+    INNER JOIN sys.columns SC_P ON (SC_P.object_id = FKC.parent_object_id)
+      AND (SC_P.column_id = FKC.parent_column_id)
+    INNER JOIN sys.objects SO_R ON SO_R.object_id = FKC.referenced_object_id
+    INNER JOIN sys.columns SC_R ON (SC_R.object_id = FKC.referenced_object_id)
+      AND (SC_R.column_id = FKC.referenced_column_id)
+    WHERE (
+        (SO_P.NAME = @tableName)
+        AND (SO_P.type = 'U')
+        )
+      OR (
+        (SO_R.NAME = @tableName)
+        AND (SO_R.type = 'U')
+        )
