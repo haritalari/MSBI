@@ -1,5 +1,0 @@
---If Sequence Exists Then Drop
-	IF Exists(SELECT * FROM sys.objects WHERE NAME = 'Mysequence_Name')
-	BEGIN
-		Drop SEQUENCE Sequence_Name
-	END
