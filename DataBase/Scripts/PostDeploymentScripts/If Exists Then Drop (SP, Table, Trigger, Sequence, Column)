@@ -1,0 +1,44 @@
+1. If Sequence Exists Then Drop
+  	IF Exists(SELECT * FROM sys.objects WHERE NAME = 'Mysequence_Name')
+	  BEGIN
+	  	Drop SEQUENCE Sequence_Name
+	  END
+--------------------------------------------------------------------------
+2. If Table Exists Then Drop
+  	IF Exists(SELECT * FROM sys.objects WHERE NAME = 'Table_Name')
+	  BEGIN
+	  	Drop Table Table_Name
+  	END
+----------------------------------------------------------------------------
+3. If column exists then drop
+
+  IF EXISTS (
+		  SELECT *
+	  	FROM sys.columns
+		  WHERE NAME = N'columnName'
+		  	AND Object_ID = Object_ID(N'PopulationDefinitionConfiguration')
+	  	)
+  BEGIN
+	  ALTER TABLE PopulationDefinitionConfiguration DROP COLUMN column_name
+  END
+-------------------------------------------------------------------------------
+4. If sp exists then drop
+   IF EXISTS( SELECT * FROM sys.procedures WHERE NAME IN( 'usp_User_Insert'))
+    BEGIN
+     DROP PROC usp_User_Insert
+   END
+   GO
+-------------------------------------------------------------------------------
+5. If trigger exists then drop
+
+    IF EXISTS (
+        SELECT *
+        FROM sys.objects
+        WHERE [type] = 'TR'
+          AND [name] = 'tr_Update_PopulationDefinition'
+          AND Object_ID = Object_ID(N'PopulationDefinition')
+        )
+    BEGIN
+      DROP TRIGGER tr_Update_PopulationDefinition
+    END;
+-------------------------------------------------------------------------------    
