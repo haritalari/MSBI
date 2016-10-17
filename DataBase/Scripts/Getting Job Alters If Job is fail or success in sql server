@@ -1,0 +1,148 @@
+DECLARE @bc INT;
+DECLARE @ec INT;
+DECLARE @bfn VARCHAR(1000);
+DECLARE @efn VARCHAR(10);
+DECLARE @DL VARCHAR(1000);-- email distribution list
+DECLARE @ReportHTML NVARCHAR(MAX);
+DECLARE @Subject NVARCHAR(250);
+DECLARE @ClientName NVARCHAR(250);
+DECLARE @ClientInstance NVARCHAR(250);
+DECLARE @IsJobFailed BIT;
+DECLARE @TodayDate DATETIME;
+
+DECLARE @AgentJobLog TABLE (
+	JobName VARCHAR(500)
+	,JobRunDateTime DATETIME
+	,JobStatus VARCHAR(10)
+	,JobOutcome VARCHAR(10)
+	)
+
+SET @TodayDate = DATEADD(mi, 330, GETUTCDATE())
+
+INSERT INTO @AgentJobLog
+SELECT JobName
+	,JobRunDateTime
+	,JobStatus
+	,JobOutcome
+FROM (
+	SELECT ROW_NUMBER() OVER (
+			PARTITION BY NAME ORDER BY [msdb].DBO.AGENT_DATETIME(RUN_DATE, RUN_TIME) DESC
+			) AS LastRun
+		,NAME AS [JobName]
+		,[msdb].DBO.AGENT_DATETIME(RUN_DATE, RUN_TIME) AS JobRunDateTime
+		,CASE 
+			WHEN enabled = 1 THEN 'Enabled'ELSE 'Disabled' END AS [JobStatus]
+		,CASE 
+			WHEN SJH.run_status = 0 THEN 'Failed'
+			WHEN SJH.run_status = 1 THEN 'Succeeded'
+			WHEN SJH.run_status = 2 THEN 'Retry'
+			WHEN SJH.run_status = 3 THEN 'Cancelled'
+			ELSE 'Unknown'
+			END AS [JobOutcome]
+	FROM [msdb].DBO.sysjobhistory SJH
+	INNER JOIN [msdb].DBO.sysjobs SJ ON SJH.job_id = sj.job_id
+	WHERE step_id = 0
+		AND NAME NOT LIKE '%syspolicy%'
+		AND LEFT(NAME, 8) = 'Navigate'
+		AND RIGHT(NAME, 5) <> '_Test'
+		AND [msdb].DBO.AGENT_DATETIME(RUN_DATE, RUN_TIME) > GETDATE() - 7
+	) a
+WHERE LastRun = 1
+	OR LastRun IS NULL
+
+IF EXISTS (
+		SELECT TOP 1 *
+		FROM @AgentJobLog
+		WHERE [JobOutcome] = 'Failed'
+		)
+BEGIN
+	SET @IsJobFailed = 1
+END
+ELSE
+BEGIN
+	SET @IsJobFailed = 0
+END
+
+-- Set email distrubution list value
+IF @IsJobFailed = 1
+BEGIN
+	SET @DL = 'gourishankar.a-ext@medseek.com; ' + 'nagababu.s-ext@influencehealth.com; naga.s-ext@influencehealth.com; rathnam.c-ext@influencehealth.com;' + 'srinivas.g-ext@influencehealth.com; sunil.k-ext@influencehealth.com;yugandhar.t-ext@influencehealth.com;' + 'dilipkumar.m-ext@influencehealth.com; gurumoorthy.v-ext@influencehealth.com; vijaya.bs-ext@influencehealth.com; vijay.k-ext@influencehealth.com'
+END
+
+IF @IsJobFailed = 0
+BEGIN
+	SET @DL = 'gourishankar.a-ext@medseek.com; ' + 'rathnam.c-ext@influencehealth.com; dilipkumar.m-ext@influencehealth.com; yugandhar.t-ext@influencehealth.com;' + 'nagababu.s-ext@influencehealth.com; naga.s-ext@influencehealth.com; srinivas.g-ext@influencehealth.com; '
+END
+
+BEGIN
+	SET @ReportHTML = N'<H1>' + CONCAT (
+			'Job Run Status on Server: '
+			,CAST(SERVERPROPERTY('MachineName') AS VARCHAR)
+			,COALESCE(', Instance: ' + CAST(SERVERPROPERTY('MachineName') AS VARCHAR) + '\' + CAST(SERVERPROPERTY('InstanceName') AS VARCHAR), ', Instance: ' + CAST(SERVERPROPERTY('MachineName') AS VARCHAR)) + CHAR(13) + CHAR(10)
+			,CASE 
+				WHEN @IsJobFailed = 1
+					THEN 'Failures Detected! Please action immediately!'
+				ELSE ''
+				END
+			) + N'</H1>' + CHAR(13) + CHAR(10) + N'<table border="1">' + CHAR(13) + CHAR(10) + N'<tr><th>JobName</th><th>JobRunDateTime</th><th>JobStatus</th><th>JobOutcome</th></tr>' + CHAR(13) + CHAR(10) + REPLACE(CAST((
+					SELECT td = JobName
+						,''
+						,td = CONVERT(VARCHAR(19), JobRunDateTime, 121)
+						,''
+						,td = JobStatus
+						,''
+						,td = JobOutcome
+						,''
+					FROM @AgentJobLog
+					FOR XML PATH('tr')
+						,TYPE
+					) AS NVARCHAR(MAX)), '</td></tr><tr><td>', '</td></tr>' + CHAR(13) + CHAR(10) + '<tr><td>') + N'</table>';
+
+	PRINT @ReportHTML
+
+	-- Build the subject line with server and instance name
+	SET @Subject = CONCAT (
+			--		'Job Run Status on Server: ',
+			--		CAST(SERVERPROPERTY('MachineName') AS VARCHAR),
+			COALESCE(CAST(SERVERPROPERTY('MachineName') AS VARCHAR) + '\' + CAST(SERVERPROPERTY('InstanceName') AS VARCHAR) + ', Instance: ', CAST(SERVERPROPERTY('MachineName') AS VARCHAR))
+			,CASE 
+				WHEN @IsJobFailed = 1
+					THEN ' - Failures Detected!'
+				ELSE ' - Report'
+				END
+			)
+
+	-- Send email to distribution list. 
+	IF @IsJobFailed = 1
+	BEGIN
+		EXEC msdb.dbo.sp_send_dbmail @recipients = ''
+			,--@DL,
+			@copy_recipients = ''
+			,@blind_copy_recipients = @DL
+			,@subject = @Subject
+			,@body = @ReportHTML
+			,@importance = 'HIGH'
+			,--'LOW', 'NORMAL', 'HIGH'
+			@body_format = 'HTML'
+			,--'TEXT', 'HTML'
+			@profile_name = 'CCM';
+	END
+	ELSE
+	--Send daily report when invoked at midnisht +- 5 minutes
+	IF @TodayDate BETWEEN DATEADD(MINUTE, - 5, CAST(CAST(@TodayDate AS DATE) AS DATETIME))
+			AND DATEADD(MINUTE, 5, CAST(CAST(@TodayDate AS DATE) AS DATETIME))
+	BEGIN
+		-- Send email to distribution list.     
+		EXEC msdb.dbo.sp_send_dbmail @recipients = ''
+			,--@DL,
+			@copy_recipients = ''
+			,@blind_copy_recipients = @DL
+			,@subject = @Subject
+			,@body = @ReportHTML
+			,@importance = 'NORMAL'
+			,--'LOW', 'NORMAL', 'HIGH'
+			@body_format = 'HTML'
+			,--'TEXT', 'HTML'
+			@profile_name = 'CCM';
+	END
+END;
