@@ -1,0 +1,24 @@
+Experince Level Interview Questions
+
+1. Storage SubSystem
+2. Physical Data Joins
+3. Logical Data Joins
+4. Data Storage Mechanism (B + Tree, Index Pages))
+5. Locking Mechanism
+6. Isolation Levels
+7. Normalization Techniques
+8. DataWarhousing stratagies
+9. Execution Plan
+10. Extended Events
+11. Strech DB
+12. BufferPool Extenstions
+13. Column store Indexes
+14. Compression Stratagies
+15. Fragmentation patterns
+16. Page Splits
+17. Seek & Scan Differences
+18. RowId, lookups
+19 DM Views
+20 Index Usage Cache
+21. Query plan cache
+22. Trace Flag
