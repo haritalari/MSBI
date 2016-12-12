@@ -1,0 +1,11 @@
+--Enable(OR)Disable Indexes
+            --Disable Specific Index on Specific table
+            ALTER INDEX PK_TestIndex ON Table_Name  Disable; 
+            --Disable all index on table
+            ALTER INDEX ALL ON Table_Name DISABLE; 
+
+
+            --Enable Index on Specific table
+            ALTER INDEX PK_TestIndex ON Table_Name  REBUILD;  
+            --Enable all index on table
+            ALTER INDEX ALL ON Table_Name  REBUILD; 
