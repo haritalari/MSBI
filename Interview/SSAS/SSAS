@@ -1,1 +1,22 @@
 
+1. What is the difference between SSAS 2005 and SSAS2008?
+   1. In 2005 its not possible to create an empty cube but in 2008 we can create an empty cube.
+   2. A new feature in Analysis Services 2008 is the Attribute Relationships tab in the Dimension Designer . 
+      to implement attribute relationship is complex in ssas 2005
+   3. we can create ONLY 2000 partitions per Measure Group in ssas 2005 and the same limit of partitions is removed in ssas 2008.
+2. What is datawarehouse in short DWH?
+   The datawarehouse is an informational environment that   
+      1. Provides an integrated and total view of the enterprise
+      2. Makes the enterprise’s current and historical information easily available for decision making
+      3, Makes decision-support transactions possible without hindering operational systems
+      4. Renders the organization’s information consistent
+      5. Presents a flexible and interactive source of strategic information
+      
+   OR a warehouse is a
+      1.Subject oriented
+      2. Integrated
+      3. Time variant
+      4. Non volatile for doing decision support
+  OR
+      Collection of data in support of management’s decision making process”. He defined the terms in the sentence as follows.      
+  
