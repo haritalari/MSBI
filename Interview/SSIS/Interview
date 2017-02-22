@@ -1,0 +1,11 @@
+• What do we mean by dataflow in SSIS?
+   Data flow is nothing but the flow of data from the corresponding sources to the referred destinations. 
+   In this process, the data transformations make changes to the data to make it ready for the data warehouse.
+
+• What is a breakpoint in SSIS? How is it setup? How do you disable it?
+  A breakpoint is a stopping point in the code. The breakpoint can give the Developer\DBA an
+  opportunity to review the status of the data, variables and the overall status of the SSIS package.
+    10 unique conditions exist for each breakpoint.
+  Breakpoints are setup in BIDS. In BIDS, navigate to the control flow interface. Right click on the
+  object where you want to set the breakpoint and select the ‘Edit Breakpoints…’ option.
+  
