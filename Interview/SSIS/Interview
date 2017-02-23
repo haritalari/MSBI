@@ -56,5 +56,94 @@ Connection Managers Available for Download
    enter quotes into the Text qualifier field then preview the data to ensure the quotes are not included.   
    
 • Can you explain how to setup a checkpoint file in SSIS?
-   Checkpoint in SSIS:- Restart of packages from point of failure
+   Checkpoint in SSIS:- Restart of packages from point of failure.
+   The following items need to be configured on the properties tab for SSIS package:
+   
+   • CheckpointFileName:– Specify the full path to the Checkpoint file that the package uses to save the value of package variables 
+   and log completed tasks. Rather than using a hard-coded path as shown above, it’s a good idea to use an expression that 
+   concatenates a path defined in a package variable and the package name.
+   
+   • CheckpointUsage:– Determines if/how checkpoints are used. Choose from these options: 
+   1) Never: The package will not use a checkpoint file and therefore will never restart.
+   2) If Exists: If a checkpoint file exists in the place you specified for the CheckpointFilename property, 
+                 then it will be used, and the package will restart according to the checkpoints written.
+   3) Always: The package will always use a checkpoint file to restart, and if one does not exist, the package will fail.
+  
+   • SaveCheckpoints:– Choose from these options: True or False (default). You must select True to implement the Checkpoint behavior.
+   
+   • The more one property you have to set on the task is FailPackageOnFailure. This must be set for each task or container that you 
+   want to be the point for a checkpoint and restart. If you do not set this property to true and the task fails, no file will be 
+   written, and the next time you invoke the package, it will start from the beginning again.
+   
+• Can you explain different options for dynamic configurations in SSIS?
+     1) XML file
+     2) custom variables
+     3) Database per environment with the variables
+     4) Use a centralized database with all variables
+     
+• What is the use of Percentage Sampling transformation in SSIS?
+   Percentage Sampling transformation is generally used for data mining. This transformation builds a random sample of set of output 
+   rows by choosing specified percentage of input rows. For example if the input has 1000 rows and if I specify 10 as percentage 
+   sample then the transformation returns 10% of the RANDOM records from the input data.     
 
+• What is the use of Term Extraction transformation in SSIS?
+   Term Extraction transformation is used to extract nouns or noun phrases or both noun and noun phrases only from English text. 
+   It extracts terms from text in a transformation input column and then writes the terms to a transformation output column. 
+   It can be also used to find out the content of a dataset.
+   
+• What is Data Viewer and what are the different types of Data Viewers in SSIS?
+   A Data Viewer allows viewing data at a point of time at runtime. If data viewer is placed before and after the Aggregate transform, 
+   we can see data flowing to the transformation at the runtime and how it looks like after the transformation occurred. 
+   The different types of data viewers are:
+      1. Grid
+      2. Histogram
+      3. Scatter Plot
+      4. Column Chart.   
+
+• What is Ignore Failure option in SSIS?
+   In Ignore Failure option, the error will be ignored and the data row will be directed to continue on the next transformation. 
+   Let’s say you have some JUNK data(wrong type of data or JUNK data) flowing from source, then using this option in SSIS 
+   we can REDIRECT the junk data records to another transformation instead of FAILING the package. 
+   This helps to MOVE only valid data to destination and JUNK can be captured into separate file.
+                  References (https://www.youtube.com/watch?v=SRM_se08OBc).
+
+• Control Flow components in SSIS?
+   • Data Preparation Tasks:-  Move files to different locations, validate data, analyze data
+      • File System Task:-The File System task performs operations on files and directories in the file system
+      • FTP Task:-The FTP task downloads and uploads data files and manages directories on servers
+      • Web Service Task:-The Web Service task executes a Web service method
+      • XML Task:- Validate and query an XML document
+      • Data Profiling Task:- Produce report assessing data quality, data patterns, and dependencies
+   • Process Communicatoin Tasks:- Interact with services, processes, or other Integration Services packages.
+      • Execute Package Task:- The Execute Package task extends the enterprise capabilities of Integration Services by letting 
+                               packages run other packages as part of a workflow.
+      • Message Queue Task:-Send and receive messages between packages
+      • WMI Data Reader Task:- Read Windows Management Instrumentation (WMI) data (memory, disk space, etc.)
+      • WMI Event Watcher Task:- Watch for Windows Management Instrumentation (WMI) events
+      • Execute Process Task:-Run programs or batch files
+      • Send Mail Task:-Send e-mail message
+   • SQL Server Tasks:- Execute bulk inserts, SQL statements, transfers of database objects
+      • Execute SQL Task:-The Execute SQL task runs SQL statements or stored procedures from a package. The task can contain either a 
+                          single SQL statement or multiple SQL statements that run sequentially.
+      • Bulk Insert Task:-The Bulk Insert task provides an efficient way to copy large amounts of data into a SQL Server table or view.
+      • Excute T-SQL Statment Task:- This task is similar to the Execute SQL task. However, the Execute T-SQL Statement task supports 
+                                      only the Transact-SQL version of the SQL language.
+   • Analysis Services Tasks:- Process Analysis Services database objects, execute data mining queries
+      • Analysis Services Processing Task:- Runs data definition language (DDL) statements that can create, drop, or alter mining 
+                                            models and multidimensional objects such as cubes and dimensions.
+      • Analysis Services Execute DDL Task:-Processes Analysis Services objects such as tabular models, cubes, dimensions, and 
+                                            mining models.
+      • Data Mining Query Task:- Runs prediction queries based on data mining models built in Analysis Services.
+   • Database Maintenance Tasks:- Perform backups, maintain indexes, and other miscellaneous tasks
+      • Rebuild Index Task:- Rebuilds indexes in SQL Server database tables and views. For more information about managing indexes.
+      • update Statistics Task:- Updates information about the distribution of key values for one or more statistics groups 
+                                 (collections) in the specified table or indexed view.
+      • Reorganize Index Task:-Reorganizes indexes in SQL Server database tables and views. For more information about 
+                               managing indexes
+   • Data Flow Tasks:- 
+   • Work Flow Tasks:-
+   • Scripting Tasks:-
+   • Containers:-
+   
+   
+   
