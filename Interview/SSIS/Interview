@@ -38,5 +38,23 @@ Connection Managers Available for Download
    SAPBI:- The SAP BI connection manager is the connection manager component of the Microsoft Connector for SAP BI. 
            The Microsoft Connector for SAP BI also includes a source and a destination.    
    TERADATA:- The Teradata connection manager is the connection manager component of the Microsoft Connector for Teradata by Attunity. 
-               The Microsoft Connector for Teradata by Attunity also includes a source and a destination.           
+               The Microsoft Connector for Teradata by Attunity also includes a source and a destination.   
+               
+• What is the use of Bulk Insert Task in SSIS?
+   Bulk Insert Task is used to upload large amount of data from flat files into Sql Server. 
+   It supports only OLE DB connections for destination database.
+
+• What is Conditional Split transformation in SSIS?
+   This is just like IF condition which checks for the given condition and based on the condition evaluation, 
+   the output will be sent to the appropriate OUTPUT path. It has ONE input and MANY outputs. 
+   Conditional Split transformation is used to send paths to different outputs based on some conditions. 
+   For example, we can organize the transform for the students in a class who have marks greater than 40 to one path 
+   and the students who score less than 40 to another path.
+   
+• How do you eliminate quotes from being uploaded from a flat file to SQL Server? 
+   This can be done using TEXT QUALIFIER property. In the SSIS package on the Flat File Connection Manager Editor, 
+   enter quotes into the Text qualifier field then preview the data to ensure the quotes are not included.   
+   
+• Can you explain how to setup a checkpoint file in SSIS?
+   Checkpoint in SSIS:- Restart of packages from point of failure
 
