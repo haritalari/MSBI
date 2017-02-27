@@ -140,10 +140,186 @@ Connection Managers Available for Download
                                  (collections) in the specified table or indexed view.
       • Reorganize Index Task:-Reorganizes indexes in SQL Server database tables and views. For more information about 
                                managing indexes
-   • Data Flow Tasks:- 
+   • Data Flow Tasks:- it consists of Data Components (Data Sources, Data Transformation, Data Destinations).
    • Work Flow Tasks:-
    • Scripting Tasks:-
-   • Containers:-
+   • Containers:-Containers are objects that provide structures to packages and extra functionality to tasks. 
+                 There are four types of containers in SSIS, they are: 
+                 • Foreach Loop Container, 
+                 • For Loop Container, 
+                 • Sequence Container and 
+                 • Task Host Container.
+• What are the different types of data sources available in SSIS?
+  There are 7 types of data sources provided by SSIS: a.) Data Reader source 
+                                                      b.) Excel source 
+                                                      c.) Flat file source 
+                                                      d.) OLEDB source 
+                                                      e.) Raw file source 
+                                                      f.) XML source 
+                                                      g.) Script component      
+• What is SSIS Designer?
+   It is a graphical tool for creating packages. It has 4 tabs: Control Flow, Data Flow, Event Handlers and Package Explorer.   
+   
+• What is Control Flow tab?
+   It is the tab in SSIS designer where various Tasks can be arranged and configured. 
+   This is the tab where we provide and control the program flow of the project.
+
+• What is Data Flow tab?
+   This is the tab where we do all the work related to ETL job. It is the tab in SSIS Designer where we can extract data from sources, 
+   transform the data and then load them into destinations.
+
+• What is the function of control flow tab in SSIS?
+   On the control flow tab, the tasks including dataflow task, containers and precedence constraints that connect containers and 
+   tasks can be arranged and configured.   
+
+• What is the function of Event handlers tab in SSIS?
+   On the Event handlers tab, workflows can be configured to respond to package events.
+   For example, we can configure Work Flow when ANY task Failes or Stops or Starts ..
+
+• What is the function of Package explorer tab in SSIS?
+   This tab provides an explorer view of the package. You can see what is happening in the package. 
+   The Package is a container at the top of the hierarchy.
+
+• What is Solution Explorer?
+   It is a place in SSIS Designer where all the projects, Data Sources, Data Source Views and other miscellaneous files 
+   can be viewed and accessed for modification.
+   
+• How do we convert data type in SSIS?
+   The Data Conversion Transformation in SSIS converts the data type of an input column to a different data type.   
+   
+• How are variables useful in ssis package?
+   Variables can provide communication among objects in the package. Variables can provide communication between parent and 
+   child packages. Variables can also be used in expressions and scripts. This helps in providing dynamic values to tasks.   
+   
+• Explain Aggregate Transformation in SSIS?
+   It aggregates data, similar you do in applying TSQL functions like Group By, Min, Max, Avg, and Count.   
+   
+• Explain Audit Transformation ?
+   It allows you to add auditing information as required in auditing world specified by HIPPA and Sarbanes-Oxley (SOX). 
+   Auditing options that you can add to transformed data through this transformation are :
+   1. Execution of Instance GUID : ID of execution instance of the package
+   2. PackageID : ID of the package
+   3. PackageName
+   4. VersionID : GUID version of the package
+   5. Execution StartTime
+   6. MachineName
+   7. UserName
+   8. TaskName
+   9. TaskID : uniqueidentifier type of the data flow task that contains audit transformation.   
+   
+• Explain Character Map Transformation?
+   It transforms some character. It gives options whether output result will override the existing column or add to new column. 
+   If you define it as new column, specify new column name. Operations available here are:
+   1. Uppercase
+   2. Lowercase
+   3. Byte reversal : such as from 0x1234 to 0x4321
+   4. Full width
+   5. Half width
+   6. Hiragana/katakana/traditional Chinese/simplified Chinese
+   7. Linguistic casing   
+   
+• Explain Copy column Transformation?
+   This component simply copies a column to another new column. Just like ALIAS Column in T-Sql.
+
+• Explain Data conversion Transformation?
+   This component does conversion data type, similar to TSQL function CAST or CONVERT. 
+   If you wish to convery the data from one type to another then this is the best bet. 
+   But please make sure that you have COMPATABLE data in the column.
+   
+• Explain Data Mining query Transformation?
+   This component does prediction on the data or fills gap on it. Some good scenarios uses this component is:
+   1. Take some input columns as number of children, domestic income, and marital income to predict whether someone owns a house or not.
+   2. Take prediction what a customer would buy based analysis buying pattern on their shopping cart.
+   3. Filling blank data or default values when customer doesn’t fill some items in the questionnaire.
+
+• Explain Derived column Transformation?
+   Derived column creates new column or put manipulation of several columns into new column. You can directly copy existing or 
+   create a new column using more than one column also.   
+   
+• Explain Merge Transformation?
+   Merge transformation merges two paths into single path. It is useful when you want to break out data into path that 
+   handles errors after the errors are handled, the data are merge back into downstream or you want to merge 2 data sources. 
+   It is similar with Union All transformation, but Merge has some restrictions :
+   1. Data should be in sorted order
+   2. Data type , data length and other meta data attribute must be similar before merged.
+   
+• Explain Union all Transformation?
+   It works in opposite way to Merge transformation. It can take output from more than 2 input paths and combines into 
+   single output path.   
+
+• Explain Merge Join Transformation?
+   Merge Join transformation will merge output from 2 inputs and doing INNER or OUTER join on the data. 
+   But if you the data come from 1 OLEDB data source, it is better you join through SQL query rather than using Merge Join 
+   transformation. Merge Join is intended to join 2 different data source.
+
+• Explain Multicast Transformation?
+   This transformation sends output to multiple output paths with no conditional as Conditional Split does. 
+   Takes ONE Input and makes the COPY of data and passes the same data through many outputs. 
+   In simple Give one input and take many outputs of the same data.   
+   
+• Explain Percentage and row sampling Transformations?
+   This transformation will take data from source and randomly sampling data. It gives you 2 outputs. 
+   First is selected data and second one is unselected data. It is used in situation where you train data mining model. 
+   These two are used to take the SAMPLE of data from the input data.
+
+• Explain Sort Transformation?
+   This component will sort data, similar in TSQL command ORDER BY. Some transformations need sorted data.  
+   
+• What r the possible locations to save SSIS package?
+   You can save a package wherever you want.
+   SQL Server
+   Package Store
+   File System
+
+• What is a package?
+   A discrete executable unit of work composed of a collection of control flow and other objects, including data sources, 
+   transformations, process sequence, and rules, errors and event handling, and data destinations.   
+ 
+• What is a workflow in SSIS?
+   A workflow is a set of instructions on how to execute tasks.
+   (It is a set of instructions on how to execute tasks such as sessions, emails and shell commands. 
+   a workflow is created form work flow mgr.
+
+• What is the diff between control flow Items and data flow Items?
+   The control flow is the highest level control process. It allows you to manage the run-time process activities of data flow and 
+   other processes within a package.
+   When we want to extract, transform and load data within a package. You add an SSIS dataflow task to the package control flow.
+   
+• What are the main component of SSIS(project-architecture)?
+   SSIS archItecture has 4 main components
+   1.ssis service
+   2.ssis runtime engine & runtime executables
+   3.ssis dataflow engine & dataflow components
+   4.ssis clients
+
+• Different components in SSIS package?
+   Control flow
+   Data flow
+   Event handler
+   Package explorer   
+   
+ • What are Connection Managers?
+   It is a bridge b/w package object and physical data. It provides logical representation of a connection at design time 
+   the properties of the connection mgr describes the physical connection that integration services creates when the package is run. 
+   
+• What is environment variable in SSIS?
+   An environment variable configuration sets a package property equal to the value in an environment variable.
+   Environmental configurations are useful for configuring properties that are dependent on the computer that is executing the package.
+
+• How to provide securIty to packages?
+   We can provide security in two ways
+   1. Package encryption
+   2. Password protection.   
+
+• What are Precedence constraints?
+   Constraints that link executable, container, and tasks wIthin the package control flow and specify condItion that determine 
+   the sequence and condItions for determine whether executable run.
+   
+• What is Design time Deployment in SSIS ?
+   When you run a package from with in BIDS,it is built and temporarily deployed to the folder. By default the package will be 
+   deployed to the BIN folder in the Package’s Project folder and you can configure for custom folder for deployment. 
+   When the Package’s execution is completed and stopped in BIDS,the deployed package will be deleted and this is called as 
+   Design Time Deployment.   
    
    
    
