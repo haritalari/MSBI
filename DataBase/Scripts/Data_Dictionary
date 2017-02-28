@@ -1,0 +1,26 @@
+
+--Data Dictionary
+
+SELECT 
+   c.ORDINAL_POSITION,
+   c.Table_Name as [TableName], 
+   c.Column_Name as [ColumnName],
+   ku.Constraint_Name as [Constraint], 
+   c.DATA_TYPE,
+   COALESCE(
+               CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR),
+               CAST(DATETIME_PRECISION AS VARCHAR),
+               CASE 
+                    WHEN NUMERIC_SCALE IS NOT NULL
+               AND NUMERIC_SCALE > 0
+                   THEN CAST(NUMERIC_PRECISION AS VARCHAR) + ',' + CAST(NUMERIC_SCALE AS VARCHAR)
+                   ELSE CAST(NUMERIC_PRECISION AS VARCHAR)
+                   END
+           )                             AS [Length]
+   ,c.NUMERIC_PRECISION, c.NUMERIC_SCALE, c.DATETIME_PRECISION
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE ku
+right JOIN INFORMATION_SCHEMA.[COLUMNS] c
+ON ku.TABLE_NAME = c.TABLE_NAME
+AND c.COLUMN_NAME = ku.COLUMN_NAME
+--WHERE c.Table_Name = 'Table_Name'
+ORDER BY 2
