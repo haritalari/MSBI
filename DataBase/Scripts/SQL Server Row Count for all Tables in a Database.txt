@@ -1,6 +1,25 @@
+--The above query dispalys the Table wise count with includes Zero rows also
+
 DECLARE @TableRowCounts TABLE ([TableName] VARCHAR(128), [RowCount] INT) ;
 INSERT INTO @TableRowCounts ([TableName], [RowCount])
 EXEC sp_MSforeachtable 'SELECT ''?'' [TableName], COUNT(*) [RowCount] FROM ?' ;
 SELECT [TableName], [RowCount]
 FROM @TableRowCounts
 ORDER BY [TableName]
+
+
+--The above query dispalys the Table wise count with excludes Zero rows 
+
+;WITH cte1
+AS (
+	SELECT SCHEMA_NAME(A.schema_id) + '.' + A.NAME AS TabName
+		,SUM(B.rows) AS RowCounts
+	FROM sys.objects A
+	INNER JOIN sys.partitions B ON A.object_id = B.object_id
+	WHERE A.type = 'U'
+	GROUP BY A.schema_id
+		,A.NAME
+	)
+SELECT *
+FROM CTE1
+WHERE RowCounts > 0
