@@ -1,6 +1,7 @@
 
 SQL SERVER
-  1. 
+  1. Get a table scheme  provding table name 
+     http://www.stormrage.com/SQLStuff/sp_GetDDLa_Latest.txt
 
 
 XML
