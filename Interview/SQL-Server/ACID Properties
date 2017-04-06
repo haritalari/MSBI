@@ -1,0 +1,40 @@
+Transaction:-
+A transaction is a batch of SQL statements that behaves like a single unit. In simple words, a transaction is a unit 
+where a sequence of work is done to complete the whole activity.
+
+ACID properties:-
+    When a transaction processing system creates a transaction, it will ensure that the transaction will have certain characteristics. 
+    The developers of the components that comprise the transaction are assured that these characteristics are in place. 
+    They do not need to manage these characteristics themselves. These characteristics are known as the ACID properties. 
+    ACID is an acronym for 
+    • Atomicity, 
+    • Consistency, 
+    • Isolation, and 
+    • Durability. 
+    
+ • Atomicity (All or NoThing Transactions):-
+The atomicity property identifies that the transaction is atomic. An atomic transaction is either fully completed, or is not begun at 
+all.An example of an atomic transaction is an account transfer transaction. The money is removed from account A then placed into 
+account B. If the system fails after removing the money from account A, then the transaction processing system will put the money back 
+into account A,thus returning the system to its original state. This is known as a rollback. Features to consider for atomicity:
+                      atomicity is maintained in the presence of deadlocks
+                      atomicity is maintained in the presence of database software failures
+                      atomicity is maintained in the presence of application software failures
+                      atomicity is maintained in the presence of CPU failures
+                      atomicity is maintained in the presence of disk failures
+                      atomicity can be turned off at the system level
+                      atomicity can be turned off at the session level
+                      
+  • Consistency: - (Guarantees that a transaction never leaves your database in a half-finished state.)
+Consistency says that after the completion of a transaction, changes made during the transaction should be consistent. 
+For example, if account “A” has been debited by 200 RS then after completion of transaction account “B” should be credited by 200 RS. 
+It means changes should be consistent.  
+
+  • Isolation: - (Transactions are Independent)
+Isolation states that every transaction should be isolated with each other, there should not be any interference between 
+two transactions.
+
+  • Durability: - (Committed data is Never Lost)
+Durability means that once the transaction is completed, all the changes should be permanent,it means that in case of any 
+system failure,changes should not be lost.
+
