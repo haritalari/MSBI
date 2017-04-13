@@ -1,0 +1,1216 @@
+﻿//Filters
+//1)	Getting all the datekeys from dimanchordate dim
+
+WITH MEMBER [Measures].[DateKey] AS [DimAnchorDate].[Date Key].CurrentMember.Member_Caption 
+SELECT 
+  Order
+  (
+    NonEmpty([DimAnchorDate].[Date Key].[Date Key],[Measures].[DrPatientKeyCnt])
+   ,DateKey
+   ,BDESC
+  ) ON ROWS
+ ,DateKey ON COLUMNS
+FROM [PopulationReportCube];   
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//1)	Getting max datekey from dimanchordate dim
+
+WITH MEMBER [Measures].[Max Date] AS 
+    TAIL
+    (NonEmpty([DimAnchorDate].[Date Key].[Date Key],[Measures].[DrPatientKeyCnt])
+     ,1).Item(0).MemberValue 
+SELECT 
+  {[Measures].[Max Date]} ON 0
+FROM [PopulationReportCube];
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Clinics
+
+WITH MEMBER [Measures].[ParameterCaption]   AS [DimClinic].[Provider Key].CurrentMember.Member_Caption 
+	 MEMBER [Measures].[ParameterValue]		AS [DimClinic].[Provider Key].CurrentMember.UniqueName 
+	 MEMBER [Measures].[ParameterLevel]		AS [DimClinic].[Provider Key].CurrentMember.Level.Ordinal 
+SELECT 
+  {
+    [Measures].[ParameterCaption]
+   ,[Measures].[ParameterValue]
+   ,[Measures].[ParameterLevel]
+  } ON COLUMNS
+ ,Order
+  (
+    Order
+    (
+      NonEmpty
+      ({[DimClinic].[Provider Key].[Provider Key]},[Measures].[PCPPatientCnt])
+     ,ParameterCaption
+     ,basc
+    )
+   ,ParameterLevel
+   ,basc
+  ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+(
+[DimAnchorDate].[Date Key].&[20130131]
+)
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+PCP
+WITH MEMBER [Measures].[ParameterCaption] AS [DimPCP].[Provider Key].CurrentMember.Member_Caption 
+	 MEMBER [Measures].[ParameterValue]   AS [DimPCP].[Provider Key].CurrentMember.UniqueName 
+	 MEMBER [Measures].[ParameterLevel]   AS [DimPCP].[Provider Key].CurrentMember.Level.Ordinal 
+SELECT 
+  {
+    [Measures].[ParameterCaption]
+   ,[Measures].[ParameterValue]
+   ,[Measures].[ParameterLevel]
+  } ON COLUMNS
+ ,Order
+  (
+    Order
+    (
+      NonEmpty
+      ([DimPCP].[Provider Key].[Provider Key],[Measures].[PCPPatientCnt])
+     ,ParameterCaption
+     ,basc
+    )
+   ,ParameterLevel
+   ,basc
+  ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimAnchorDate].[Date Key].&[20130131]
+   ,[DimClinic].[Provider Key].&[283982]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Healthplan
+WITH MEMBER [Measures].[ParameterCaption] AS [DimHealthPlan].[Health Plan Key].CurrentMember.Member_Caption 
+	 MEMBER [Measures].[ParameterValue] AS [DimHealthPlan].[Health Plan Key].CurrentMember.UniqueName 
+	 MEMBER [Measures].[ParameterLevel] AS [DimHealthPlan].[Health Plan Key].CurrentMember.Level.Ordinal 
+SELECT 
+  {
+    ParameterCaption
+   ,ParameterValue
+   ,ParameterLevel
+  } ON COLUMNS
+ ,[DimHealthPlan].[Health Plan Key].[Health Plan Key] ON ROWS
+FROM PopulationReportCube;
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Product
+
+WITH MEMBER [Measures].[ParameterCaption] AS [DimProduct].[Product Key].CurrentMember.Member_Caption 
+	 MEMBER [Measures].[ParameterValue] AS [DimProduct].[Product Key].CurrentMember.UniqueName 
+	 MEMBER [Measures].[ParameterLevel] AS [DimProduct].[Product Key].CurrentMember.Level.Ordinal 
+SELECT 
+  {
+    ParameterCaption
+   ,ParameterValue
+   ,ParameterLevel
+  } ON COLUMNS
+ ,[DimProduct].[Product Key].[Product Key] ON ROWS
+FROM PopulationReportCube;
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//1)	Conditions
+WITH MEMBER TotalPatientCnt   AS [Measures].[HealthPlanPatientCnt] 
+     MEMBER PrevalencePercent AS [Measures].[DrPatientKeyCnt] * 1 / [Measures].[TotalPatientCnt] * 100  ,format_string = '#,##.00' 
+     MEMBER DrKey			  AS [DimPopulation].[Population Key].CurrentMember.Member_Key
+     MEMBER DrName            AS [DimPopulation].[Population Key].CurrentMember.Member_Caption 
+
+SELECT 
+  {
+    [Measures].DrKey
+   ,[Measures].DrName
+   ,[Measures].DrPatientKeyCnt
+   ,[Measures].TotalPatientCnt
+   ,[Measures].PrevalencePercent
+  } ON COLUMNS
+
+ ,Order
+  (
+    NonEmpty([DimPopulation].[Population Key].[Population Key]
+			,[Measures].[DrPatientKeyCnt])
+   ,[Measures].[DrPatientKeyCnt]
+   ,BASC
+  ) ON ROWS
+FROM [PopulationReportCube]
+WHERE ([DimReport].[Report Key].&[3],[DimAnchorDate].[Date Key].&[20141031]
+		---- Need to append params dynamically
+	  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Conditions Trend
+
+WITH MEMBER TotalPatientCnt    AS [Measures].[HealthPlanPatientCnt] 
+	 MEMBER PrevalencePercent  AS [Measures].[DrPatientKeyCnt] * 1 / [Measures].[TotalPatientCnt] * 100 ,format_string = '#,##.00' 
+     MEMBER DrKey              AS [DimPopulation].[Population Key].CurrentMember.Member_Key 
+     MEMBER DrName             AS [DimPopulation].[Population Key].CurrentMember.Member_Caption 
+     MEMBER AnchorDate         AS [DimAnchorDate].[Date Key].CurrentMember.Member_Caption 
+SELECT 
+  {
+    [Measures].[DrKey]
+   ,[Measures].[DrName]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[PrevalencePercent]
+   ,[Measures].[AnchorDate]
+  } ON COLUMNS
+ ,Order
+  (
+    NonEmpty({NULL : [DimAnchorDate].[Date Key].&[20141031]}
+            ,[Measures].[DrPatientKeyCnt])
+   ,[Measures].[DrPatientKeyCnt]
+   ,BASC
+  ) ON ROWS
+FROM [PopulationReportCube]
+WHERE ([DimReport].[Report Key].&[3] ,[DimPopulation].[Population Key].&[188]
+---- Need to append params dynamically
+      );
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//2)	Conditions Drilldown
+
+WITH MEMBER [Measures].[DrList]  
+			AS Generate([DimPatientDr].[Population Key].[Population Key].MEMBERS
+						,IIF([Measures].[DrCnt] <> 0 ,[DimPatientDr].[Population Key].CurrentMember.Member_Caption + ", " ,NULL)) 
+	 MEMBER [Measures].[ProgramList] 
+	        AS Generate([DimPatientProgram].[Program Key].[Program Key].MEMBERS
+                       ,IIF([Measures].[ProgramCnt] <> 0,[DimPatientProgram].[Program Key].CurrentMember.Member_Caption+ ", ",NULL)) 
+     MEMBER PatientName   AS  [DimPatient].[Full Name].CurrentMember.Member_Caption 
+     MEMBER PatientAge    AS  [DimPatient].[Age].CurrentMember.Member_Caption 
+     MEMBER PatientGender AS  [DimPatient].[Gender].CurrentMember.Member_Caption 
+     MEMBER PatientMRN    AS  [DimPatient].[Medical Record Number].CurrentMember.Member_Caption 
+     MEMBER PatientPhone  AS  [DimPatient].[Phone No].CurrentMember.Member_Caption 
+     MEMBER Patientkey    AS  [DimPatient].[Patient Key].CurrentMember.Member_Caption 
+     MEMBER [Measures].[PCPList] 
+			AS Generate([DimPatientPCP].[Provider Key].[Provider Key].MEMBERS
+					   ,IIF([Measures].[PCPCnt] <> 0,[DimPatientPCP].[Provider Key].CurrentMember.Member_Caption+ ', ',NULL))    
+SELECT 
+  SubSet
+  (
+    NonEmpty([DimPatient].[Patient Key].[Patient Key]
+			,{[Measures].[DrPatientKeyCnt]})
+   ,0
+   ,100
+  ) ON ROWS
+ ,{
+    [Measures].[Patientkey]
+   ,[Measures].[PatientName]
+   ,[Measures].[PatientAge]
+   ,[Measures].[PatientGender]
+   ,[Measures].[PatientMRN]
+   ,[Measures].[PatientPhone]
+   ,[Measures].[DrCnt]
+   ,[Measures].[PCPList]
+   ,[Measures].[DrList]
+   ,[Measures].[ProgramList]
+  } ON COLUMNS
+FROM [PopulationReportCube]
+WHERE 
+  ( [DimReport].[Report Key].&[3]
+   ,[DimPopulation].[Population key].&[173]
+   ,[DimAnchorDate].[Date Key].&[20141031]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//3)	Metrics
+//i)	Process Metric with Isprimary flag
+WITH MEMBER NrName   AS [DimMetric].[MetricName].CurrentMember.Member_Caption 
+	 MEMBER NrKey    AS [DimMetric].[Metric Key].CurrentMember.Member_Caption 
+	 MEMBER DrKey    AS [DimPopulation].[Population Key].CurrentMember.Member_Key 
+	 MEMBER Measures.GDCnt AS Count( NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[GD])
+					                          ,[Measures].[NrPatientKeyCnt])) 
+     MEMBER Measures.NTCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[NT])
+                                             ,[Measures].[NrPatientKeyCnt])) 
+     MEMBER Measures.PRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[PR])
+                                             ,[Measures].[NrPatientKeyCnt])) 
+     MEMBER Measures.FRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[FR])
+                                             ,[Measures].[NrPatientKeyCnt])) 
+     MEMBER [Measures].[GDRange] 
+		    AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[GDCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER [Measures].[NTRange] 
+		    AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[NTCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER [Measures].[PRRange] 
+		     AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					,IIF([Measures].[PRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[FRRange] 
+			 AS Generate ([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+						 ,IIF( [Measures].[FRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER GDPercent AS [Measures].[GDCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER NTPercent AS [Measures].[NTCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER PRPercent AS [Measures].[PRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER FRPercent AS [Measures].[FRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+
+SELECT 
+  {
+    [Measures].[DrKey]
+   ,[Measures].[NrKey]
+   ,[Measures].[NrName]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[GDCnt]
+   ,[Measures].[NTCnt]
+   ,[Measures].[PRCnt]
+   ,[Measures].[FRCnt]
+   ,[Measures].[GDRange]
+   ,[Measures].[NTRange]
+   ,[Measures].[PRRange]
+   ,[Measures].[FRRange]
+   ,[Measures].[GDPercent]
+   ,[Measures].[NTPercent]
+   ,[Measures].[PRPercent]
+   ,[Measures].[FRPercent]
+  } ON COLUMNS
+
+ ,NON EMPTY 
+    NonEmpty
+    (
+      Order
+      (
+        (
+          [DimPopulation].[Population Key].[Population Key]
+         ,NonEmpty([DimMetric].[Metric Key].[Metric Key]
+				  ,{[Measures].[NrPatientKeyCnt]})
+        )
+       ,[Measures].[DrPatientKeyCnt]
+       ,BASC
+      )
+     ,[Measures].[NrPatientKeyCnt]
+    ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].[Condition Prevalence]
+   ,[DimMetric].[Metric Type].&[N]
+   ,[DimMetric].[Numerator Type].&[C]
+   ,[BridgeReportConfiguration].[Is Primary].&[True]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+---- Need to append params dynamically
+  );  
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//II)	Process Metric all the metrics
+
+WITH MEMBER NrName		   AS [DimMetric].[MetricName].CurrentMember.Member_Caption 
+	 MEMBER NrKey          AS  [DimMetric].[Metric Key].CurrentMember.Member_Caption 
+	 MEMBER DrKey          AS  [DimPopulation].[Population Key].CurrentMember.Member_Key 
+	 MEMBER Measures.GDCnt AS  Count( NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[GD])
+											   ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.NTCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[NT])
+											  ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.PRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[PR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.FRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[FR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER [Measures].[GDRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[GDCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER [Measures].[NTRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+                       ,IIF([Measures].[NTCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER [Measures].[PRRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+                       ,IIF([Measures].[PRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER [Measures].[FRRange] 
+	        AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+                       ,IIF([Measures].[FRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER GDPercent AS [Measures].[GDCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER NTPercent AS [Measures].[NTCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+     MEMBER PRPercent AS [Measures].[PRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+     MEMBER FRPercent AS [Measures].[FRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+SELECT 
+  {
+    [Measures].[DrKey]
+   ,[Measures].[NrKey]
+   ,[Measures].[NrName]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[GDCnt]
+   ,[Measures].[NTCnt]
+   ,[Measures].[PRCnt]
+   ,[Measures].[FRCnt]
+   ,[Measures].[GDRange]
+   ,[Measures].[NTRange]
+   ,[Measures].[PRRange]
+   ,[Measures].[FRRange]
+   ,[Measures].[GDPercent]
+   ,[Measures].[NTPercent]
+   ,[Measures].[PRPercent]
+   ,[Measures].[FRPercent]
+  } ON COLUMNS
+ ,NON EMPTY 
+    NonEmpty
+    (
+      Order
+      (
+        (
+          [DimPopulation].[Population Key].&[307]
+         ,NonEmpty ( [DimMetric].[Metric Key].[Metric Key]
+           ,{[Measures].[NrPatientKeyCnt]})
+        )
+       ,[Measures].[DrPatientKeyCnt]
+       ,BASC
+      )
+     ,[Measures].[NrPatientKeyCnt]
+    ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].[Condition Prevalence]
+   ,[DimMetric].[Metric Type].&[N]
+   ,[DimMetric].[Numerator Type].&[C]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+---- Need to append params dynamically
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Process metric drill down
+WITH MEMBER [Measures].[DrList] 
+			AS Generate([DimPatientDr].[Population Key].[Population Key].MEMBERS
+					   ,IIF([Measures].[DrCnt] <> 0,[DimPatientDr].[Population Key].CurrentMember.Member_Caption+ ", ",NULL)) 
+	 MEMBER [Measures].[ProgramList] 
+			AS Generate([DimPatientProgram].[Program Key].[Program Key].MEMBERS
+						,IIF([Measures].[ProgramCnt] <> 0 ,[DimPatientProgram].[Program Key].CurrentMember.Member_Caption+ ", ",NULL) ) 
+	 MEMBER PatientName   AS [DimPatient].[Full Name].CurrentMember.Member_Caption 
+	 MEMBER PatientAge    AS [DimPatient].[Age].CurrentMember.Member_Caption 
+	 MEMBER PatientGender AS [DimPatient].[Gender].CurrentMember.Member_Caption 
+	 MEMBER PatientMRN    AS [DimPatient].[Medical Record Number].CurrentMember.Member_Caption 
+     MEMBER PatientPhone  AS [DimPatient].[Phone No].CurrentMember.Member_Caption 
+     MEMBER Patientkey    AS  [DimPatient].[Patient Key].CurrentMember.Member_Caption 
+	 MEMBER [Measures].[PCPList] 
+			AS Generate([DimPatientPCP].[Provider Key].[Provider Key].MEMBERS
+					   ,IIF([Measures].[PCPCnt] <> 0,[DimPatientPCP].[Provider Key].CurrentMember.Member_Caption+ ', ',NULL ))    
+SELECT 
+  SubSet
+  (
+    NonEmpty([DimPatient].[Patient Key].[Patient Key]
+     ,{[Measures].[NrPatientKeyCnt]})
+   ,0
+   ,1000
+  ) ON ROWS
+ ,{
+    [Measures].[Patientkey]
+   ,[Measures].[PatientName]
+   ,[Measures].[PatientAge]
+   ,[Measures].[PatientGender]
+   ,[Measures].[PatientMRN]
+   ,[Measures].[PatientPhone]
+   ,[Measures].[DrCnt]
+   ,[Measures].[PCPList]
+   ,[Measures].[DrList]
+   ,[Measures].[ProgramList]
+  } ON COLUMNS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].&[3]
+   ,[DimPopulation].[Population key].&[190]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+   ,[DimMetric].[Metric Type].&[N]
+   ,[DimMetric].[Numerator Type].&[C]
+   ,[DimMetric].[Metric Key].[54]
+   ,[BridgeMetricNrFrequency].[Label].&[NT]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//	Outcome
+//i)	Outcome Metric with Isprimary flag
+WITH 
+  MEMBER NrName AS [DimMetric].[MetricName].CurrentMember.Member_Caption 
+  MEMBER NrKey  AS [DimMetric].[Metric Key].CurrentMember.Member_Caption 
+  MEMBER DrKey  AS [DimPopulation].[Population Key].CurrentMember.Member_Key
+  MEMBER Measures.GDCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[GD])
+										  ,[Measures].[NrPatientKeyCnt])) 
+  MEMBER Measures.NTCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[NT])
+										  ,[Measures].[NrPatientKeyCnt])) 
+  MEMBER Measures.PRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[PR])
+										  ,[Measures].[NrPatientKeyCnt])) 
+  MEMBER Measures.FRCnt AS Count(NonEmpty(( [DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[FR])
+										  ,[Measures].[NrPatientKeyCnt])) 
+  MEMBER [Measures].[GDRange]
+		 AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					,IIF([Measures].[GDCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+  MEMBER [Measures].[NTRange] 
+		 AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					,IIF([Measures].[NTCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+  MEMBER [Measures].[PRRange]
+		 AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					,IIF([Measures].[PRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+  MEMBER [Measures].[FRRange] 
+		 AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					,IIF ([Measures].[FRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+  MEMBER GDPercent AS [Measures].[GDCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+  MEMBER NTPercent AS [Measures].[NTCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+  MEMBER PRPercent AS [Measures].[PRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+  MEMBER FRPercent AS [Measures].[FRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+SELECT 
+  {
+    [Measures].[DrKey]
+   ,[Measures].[NrKey]
+   ,[Measures].[NrName]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[GDCnt]
+   ,[Measures].[NTCnt]
+   ,[Measures].[PRCnt]
+   ,[Measures].[FRCnt]
+   ,[Measures].[GDRange]
+   ,[Measures].[NTRange]
+   ,[Measures].[PRRange]
+   ,[Measures].[FRRange]
+   ,[Measures].[GDPercent]
+   ,[Measures].[NTPercent]
+   ,[Measures].[PRPercent]
+   ,[Measures].[FRPercent]
+  } ON COLUMNS
+ ,NON EMPTY 
+    NonEmpty
+    (
+      Order
+      (
+        (
+          [DimPopulation].[Population Key].[Population Key]
+         ,NonEmpty([DimMetric].[Metric Key].[Metric Key]
+				  ,{[Measures].[NrPatientKeyCnt]}))
+       ,[Measures].[DrPatientKeyCnt]
+       ,BASC
+      )
+     ,[Measures].[NrPatientKeyCnt]
+    ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].[Condition Prevalence]
+   ,[DimMetric].[Metric Type].&[N]
+   ,[DimMetric].[Numerator Type].&[V]
+   ,[BridgeReportConfiguration].[Is Primary].&[True]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+---- Need to append params dynamically
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//II)	Outcome Metric all the metrics
+
+
+WITH MEMBER NrName AS [DimMetric].[MetricName].CurrentMember.Member_Caption 
+	 MEMBER NrKey  AS [DimMetric].[Metric Key].CurrentMember.Member_Caption 
+	 MEMBER DrKey  AS [DimPopulation].[Population Key].CurrentMember.Member_Key 
+	 MEMBER Measures.GDCnt 
+			AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[GD])
+							  ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.NTCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[NT])
+                                             ,[Measures].[NrPatientKeyCnt])) 
+     MEMBER Measures.PRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[PR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+     MEMBER Measures.FRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[FR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER [Measures].[GDRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[GDCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER [Measures].[NTRange] AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[NTCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[PRRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[PRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[FRRange] 
+			AS Generate( [BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+						,IIF([Measures].[FRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER GDPercent AS [Measures].[GDCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER NTPercent AS [Measures].[NTCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER PRPercent AS [Measures].[PRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER FRPercent AS [Measures].[FRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+
+SELECT 
+  {
+    [Measures].[DrKey]
+   ,[Measures].[NrKey]
+   ,[Measures].[NrName]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[GDCnt]
+   ,[Measures].[NTCnt]
+   ,[Measures].[PRCnt]
+   ,[Measures].[FRCnt]
+   ,[Measures].[GDRange]
+   ,[Measures].[NTRange]
+   ,[Measures].[PRRange]
+   ,[Measures].[FRRange]
+   ,[Measures].[GDPercent]
+   ,[Measures].[NTPercent]
+   ,[Measures].[PRPercent]
+   ,[Measures].[FRPercent]
+  } ON COLUMNS
+ ,NON EMPTY 
+    NonEmpty
+    (
+      Order
+      (
+        (
+          [DimPopulation].[Population Key].&[307]
+         ,NonEmpty([DimMetric].[Metric Key].[Metric Key]
+                  ,{[Measures].[NrPatientKeyCnt]})
+        )
+       ,[Measures].[DrPatientKeyCnt]
+       ,BASC
+      )
+     ,[Measures].[NrPatientKeyCnt]
+    ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].[Condition Prevalence]
+   ,[DimMetric].[Metric Type].&[N]
+   ,[DimMetric].[Numerator Type].&[V]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+---- Need to append params dynamically
+  ); 
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Outcome metric drill down
+WITH MEMBER [Measures].[DrList] AS 
+    Generate
+    (
+      [DimPatientDr].[Population Key].[Population Key].MEMBERS
+     ,IIF
+      (
+        [Measures].[DrCnt] <> 0
+       ,
+            [DimPatientDr].[Population Key].CurrentMember.Member_Caption
+        + ", "
+       ,NULL
+      )
+    ) 
+  MEMBER [Measures].[ProgramList] AS 
+    Generate
+    (
+      [DimPatientProgram].[Program Key].[Program Key].MEMBERS
+     ,IIF
+      (
+        [Measures].[ProgramCnt] <> 0
+       ,
+            [DimPatientProgram].[Program Key].CurrentMember.Member_Caption
+        + ", "
+       ,NULL
+      )
+    ) 
+  MEMBER PatientName   AS [DimPatient].[Full Name].CurrentMember.Member_Caption 
+  MEMBER PatientAge    AS [DimPatient].[Age].CurrentMember.Member_Caption 
+  MEMBER PatientGender AS [DimPatient].[Gender].CurrentMember.Member_Caption 
+  MEMBER PatientMRN    AS [DimPatient].[Medical Record Number].CurrentMember.Member_Caption 
+  MEMBER PatientPhone  AS [DimPatient].[Phone No].CurrentMember.Member_Caption 
+  MEMBER Patientkey    AS  [DimPatient].[Patient Key].CurrentMember.Member_Caption 
+  MEMBER [Measures].[PCPList] 
+		 AS Generate([DimPatientPCP].[Provider Key].[Provider Key].MEMBERS
+					,IIF([Measures].[PCPCnt] <> 0,[DimPatientPCP].[Provider Key].CurrentMember.Member_Caption+ ', ',NULL))    
+SELECT 
+  SubSet
+  (
+    NonEmpty([DimPatient].[Patient Key].[Patient Key]
+			,{[Measures].[NrPatientKeyCnt]})
+   ,0
+   ,1000
+  ) ON ROWS
+ ,{
+    [Measures].[Patientkey]
+   ,[Measures].[PatientName]
+   ,[Measures].[PatientAge]
+   ,[Measures].[PatientGender]
+   ,[Measures].[PatientMRN]
+   ,[Measures].[PatientPhone]
+   ,[Measures].[DrCnt]
+   ,[Measures].[PCPList]
+   ,[Measures].[DrList]
+   ,[Measures].[ProgramList]
+  } ON COLUMNS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].&[3]
+   ,[DimPopulation].[Population key].&[190]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+   ,[DimMetric].[Metric Type].&[N]
+   ,[DimMetric].[Numerator Type].&[V]
+   ,[DimMetric].[Metric Key].[54]
+   ,[BridgeMetricNrFrequency].[Label].&[NT]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//	Utilization
+//i)	Utilization Metric with Isprimary flag
+WITH MEMBER NrName  AS [DimMetric].[MetricName].CurrentMember.Member_Caption 
+	 MEMBER NrKey   AS [DimMetric].[Metric Key].CurrentMember.Member_Caption 
+	 MEMBER DrKey   AS [DimPopulation].[Population Key].CurrentMember.Member_Key
+	 MEMBER Measures.GDCnt AS  Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[GD])
+											 ,[Measures].[NrPatientKeyCnt])) 
+     MEMBER Measures.NTCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[NT])
+											 ,[Measures].[NrPatientKeyCnt])) 
+     MEMBER Measures.PRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[PR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.FRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[FR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER [Measures].[GDRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[GDCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER [Measures].[NTRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[NTCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+     MEMBER [Measures].[PRRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+						,IIF ([Measures].[PRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[FRRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+						,IIF([Measures].[FRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER GDPercent AS [Measures].[GDCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER NTPercent AS [Measures].[NTCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+     MEMBER PRPercent AS [Measures].[PRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+     MEMBER FRPercent AS [Measures].[FRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+SELECT 
+  {
+    [Measures].[DrKey]
+   ,[Measures].[NrKey]
+   ,[Measures].[NrName]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[GDCnt]
+   ,[Measures].[NTCnt]
+   ,[Measures].[PRCnt]
+   ,[Measures].[FRCnt]
+   ,[Measures].[GDRange]
+   ,[Measures].[NTRange]
+   ,[Measures].[PRRange]
+   ,[Measures].[FRRange]
+   ,[Measures].[GDPercent]
+   ,[Measures].[NTPercent]
+   ,[Measures].[PRPercent]
+   ,[Measures].[FRPercent]
+  } ON COLUMNS
+ ,NON EMPTY 
+    NonEmpty
+    (
+      Order
+      (
+        (
+          [DimPopulation].[Population Key].[Population Key]
+         ,NonEmpty([DimMetric].[Metric Key].[Metric Key]
+				  ,{[Measures].[NrPatientKeyCnt]}))
+       ,[Measures].[DrPatientKeyCnt]
+       ,BASC
+      )
+     ,[Measures].[NrPatientKeyCnt]
+    ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].[Condition Prevalence]
+   ,[DimMetric].[Metric Type].&[U]
+   ,[DimMetric].[Numerator Type].&[C]
+   ,[BridgeReportConfiguration].[Is Primary].&[True]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+---- Need to append params dynamically
+);
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//II)	Utilization Metric all the metrics
+
+WITH MEMBER NrName AS [DimMetric].[MetricName].CurrentMember.Member_Caption 
+	 MEMBER NrKey  AS [DimMetric].[Metric Key].CurrentMember.Member_Caption 
+	 MEMBER DrKey  AS [DimPopulation].[Population Key].CurrentMember.Member_Key 
+	 MEMBER Measures.GDCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[GD])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.NTCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[NT])
+											,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.PRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[PR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.FRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[FR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER [Measures].[GDRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[GDCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[NTRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+						,IIF([Measures].[NTCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[PRRange] 
+			AS Generate( [BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+						,IIF([Measures].[PRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[FRRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+						,IIF([Measures].[FRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER GDPercent AS [Measures].[GDCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER NTPercent AS [Measures].[NTCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER PRPercent AS [Measures].[PRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER FRPercent AS [Measures].[FRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+SELECT 
+  {
+    [Measures].[DrKey]
+   ,[Measures].[NrKey]
+   ,[Measures].[NrName]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[GDCnt]
+   ,[Measures].[NTCnt]
+   ,[Measures].[PRCnt]
+   ,[Measures].[FRCnt]
+   ,[Measures].[GDRange]
+   ,[Measures].[NTRange]
+   ,[Measures].[PRRange]
+   ,[Measures].[FRRange]
+   ,[Measures].[GDPercent]
+   ,[Measures].[NTPercent]
+   ,[Measures].[PRPercent]
+   ,[Measures].[FRPercent]
+  } ON COLUMNS
+ ,NON EMPTY 
+    NonEmpty
+    (
+      Order
+      (
+        (
+          [DimPopulation].[Population Key].&[307]
+         ,NonEmpty([DimMetric].[Metric Key].[Metric Key]
+				 ,{[Measures].[NrPatientKeyCnt]})
+        )
+       ,[Measures].[DrPatientKeyCnt]
+       ,BASC
+      )
+     ,[Measures].[NrPatientKeyCnt]
+    ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].[Condition Prevalence]
+   ,[DimMetric].[Metric Type].&[U]
+   ,[DimMetric].[Numerator Type].&[C]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+---- Need to append params dynamically
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Utilization metric drill down
+WITH MEMBER [Measures].[DrList] 
+			AS Generate([DimPatientDr].[Population Key].[Population Key].MEMBERS
+					   ,IIF([Measures].[DrCnt] <> 0, [DimPatientDr].[Population Key].CurrentMember.Member_Caption+ ", ",NULL)) 
+	 MEMBER [Measures].[ProgramList] 
+			AS  Generate([DimPatientProgram].[Program Key].[Program Key].MEMBERS
+						,IIF([Measures].[ProgramCnt] <> 0,[DimPatientProgram].[Program Key].CurrentMember.Member_Caption+ ", ",NULL)) 
+	 MEMBER PatientName   AS [DimPatient].[Full Name].CurrentMember.Member_Caption 
+	 MEMBER PatientAge    AS [DimPatient].[Age].CurrentMember.Member_Caption 
+	 MEMBER PatientGender AS [DimPatient].[Gender].CurrentMember.Member_Caption 
+	 MEMBER PatientMRN	  AS [DimPatient].[Medical Record Number].CurrentMember.Member_Caption 
+	 MEMBER PatientPhone  AS [DimPatient].[Phone No].CurrentMember.Member_Caption 
+	 MEMBER Patientkey    AS [DimPatient].[Patient Key].CurrentMember.Member_Caption 
+	 MEMBER [Measures].[PCPList] 
+			AS Generate([DimPatientPCP].[Provider Key].[Provider Key].MEMBERS
+						,IIF( [Measures].[PCPCnt] <> 0,[DimPatientPCP].[Provider Key].CurrentMember.Member_Caption+ ', ',NULL)
+    )    
+SELECT 
+  SubSet
+  (
+    NonEmpty([DimPatient].[Patient Key].[Patient Key]
+			,{[Measures].[NrPatientKeyCnt]})
+   ,0
+   ,1000
+  ) ON ROWS
+ ,{
+    [Measures].[Patientkey]
+   ,[Measures].[PatientName]
+   ,[Measures].[PatientAge]
+   ,[Measures].[PatientGender]
+   ,[Measures].[PatientMRN]
+   ,[Measures].[PatientPhone]
+   ,[Measures].[DrCnt]
+   ,[Measures].[PCPList]
+   ,[Measures].[DrList]
+   ,[Measures].[ProgramList]
+  } ON COLUMNS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].&[3]
+   ,[DimPopulation].[Population key].&[190]
+   ,[DimAnchorDate].[Date Key].&[20131031]
+   ,[DimMetric].[Metric Type].&[U]
+   ,[DimMetric].[Numerator Type].&[C]
+   ,[DimMetric].[Metric Key].[54]
+   ,[BridgeMetricNrFrequency].[Label].&[NT]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Metrics Trend
+WITH MEMBER NrName        AS [DimMetric].[MetricName].CurrentMember.Member_Caption 
+	 MEMBER Measures.GDCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[GD])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.NTCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[NT])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.PRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[PR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER Measures.FRCnt AS Count(NonEmpty(([DimPatient].[Patient Key].[Patient Key],[BridgeMetricNrFrequency].[Label].&[FR])
+											 ,[Measures].[NrPatientKeyCnt])) 
+	 MEMBER [Measures].[GDRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[GDCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[NTRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[NTCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[PRRange] 
+			AS Generate ([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+						,IIF([Measures].[PRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER [Measures].[FRRange] 
+			AS Generate([BridgeMetricNrFrequency].[Range].[Range].MEMBERS
+					   ,IIF([Measures].[FRCnt] <> 0,[BridgeMetricNrFrequency].[Range].CurrentMember.Member_Caption,NULL)) 
+	 MEMBER GDPercent  AS [Measures].[GDCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER NTPercent  AS [Measures].[NTCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER PRPercent  AS [Measures].[PRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER FRPercent  AS [Measures].[FRCnt] / [Measures].[DrPatientKeyCnt] * 100 ,format_string = '#,##.00' 
+	 MEMBER AnchorDate AS [DimAnchorDate].[Date Key].CurrentMember.Member_Caption 
+   
+   
+   
+SELECT 
+  {
+    [Measures].[AnchorDate]
+   ,[Measures].[NrName]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[GDCnt]
+   ,[Measures].[NTCnt]
+   ,[Measures].[PRCnt]
+   ,[Measures].[FRCnt]
+   ,[Measures].[GDRange]
+   ,[Measures].[NTRange]
+   ,[Measures].[PRRange]
+   ,[Measures].[FRRange]
+   ,[Measures].[GDPercent]
+   ,[Measures].[NTPercent]
+   ,[Measures].[PRPercent]
+   ,[Measures].[FRPercent]
+  } ON COLUMNS
+ ,NON EMPTY 
+    NonEmpty
+    (
+      Order
+      (
+        (
+        {null:[DimAnchorDate].[Date Key].&[20141031]}
+          
+         ,NonEmpty([DimMetric].[Metric Key].&[54]
+                 ,{[Measures].[NrPatientKeyCnt]})
+        )
+       ,[Measures].[DrPatientKeyCnt]
+       ,BASC
+      )
+     ,[Measures].[NrPatientKeyCnt]
+    ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].[Condition Prevalence]
+   ,[DimMetric].[Metric Type].&[N]
+   ,[DimMetric].[Numerator Type].&[C]
+   ,[DimPopulation].[Population Key].&[190]
+---- Need to append params dynamically
+
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//Comorbidity
+WITH  MEMBER TotalPatientCnt   AS [Measures].[HealthPlanPatientCnt] 
+	  MEMBER PrevalencePercent AS [Measures].[DrPatientKeyCnt] * 1 / [Measures].[TotalPatientCnt] * 100 ,format_string = '#,##.00' 
+	  MEMBER ChronicConditions AS [DimSequence].[Seq No].CurrentMember.Member_Caption 
+SELECT 
+  {
+    [Measures].[ChronicConditions]
+   ,[Measures].[DrPatientKeyCnt]
+   ,[Measures].[TotalPatientCnt]
+   ,[Measures].[PrevalencePercent]
+  } ON COLUMNS
+ ,Order
+  (
+    NonEmpty([DimSequence].[Seq No].[Seq No]
+			,[Measures].[DrPatientKeyCnt])
+   ,[Measures].[DrPatientKeyCnt]
+   ,BASC
+  ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimAnchorDate].[Date Key].&[20141031]
+   ,[DimReport].[Report Key].&[1]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//Comorbidity Drill down
+WITH MEMBER [Measures].[DrList] 
+			AS Generate([DimPatientDr].[Population Key].[Population Key].MEMBERS
+					 ,IIF([Measures].[DrCnt] <> 0,[DimPatientDr].[Population Key].CurrentMember.Member_Caption+ ", ",NULL)) 
+	 MEMBER [Measures].[ProgramList] 
+			AS Generate([DimPatientProgram].[Program Key].[Program Key].MEMBERS
+					   ,IIF([Measures].[ProgramCnt] <> 0,[DimPatientProgram].[Program Key].CurrentMember.Member_Caption+ ", ",NULL)) 
+	 MEMBER PatientName AS [DimPatient].[Full Name].CurrentMember.Member_Caption 
+	 MEMBER PatientAge  AS [DimPatient].[Age].CurrentMember.Member_Caption 
+     MEMBER PatientGender AS [DimPatient].[Gender].CurrentMember.Member_Caption 
+	 MEMBER PatientMRN AS [DimPatient].[Medical Record Number].CurrentMember.Member_Caption 
+	 MEMBER PatientPhone AS [DimPatient].[Phone No].CurrentMember.Member_Caption 
+	 MEMBER Patientkey AS [DimPatient].[Patient Key].CurrentMember.Member_Caption 
+	MEMBER [Measures].[PCPList] 
+			AS Generate([DimPatientPCP].[Provider Key].[Provider Key].MEMBERS
+					   ,IIF([Measures].[PCPCnt] <> 0,[DimPatientPCP].[Provider Key].CurrentMember.Member_Caption+ ', ',NULL))    
+SELECT 
+  SubSet
+  (
+    NonEmpty
+    (([DimPatient].[Patient Key].[Patient Key],[DimSequence].[Seq No].&[8])
+     ,{[Measures].[DrPatientKeyCnt]}
+    )
+   ,0
+   ,50000
+  ) ON ROWS
+ ,{
+    [Measures].[Patientkey]
+   ,[Measures].[PatientName]
+   ,[Measures].[PatientAge]
+   ,[Measures].[PatientGender]
+   ,[Measures].[PatientMRN]
+   ,[Measures].[PatientPhone]
+   ,[Measures].[DrCnt]
+   ,[Measures].[PCPList]
+   ,[Measures].[DrList]
+   ,[Measures].[ProgramList]
+  } ON COLUMNS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].&[1]
+   ,[DimAnchorDate].[Date Key].&[20141031]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Comorbidity Conditions
+WITH MEMBER DrKey AS [DimPopulation].[Population Key].CurrentMember.Member_Caption 
+	 MEMBER ConditionKey AS [DimPopulation].[Population Key].CurrentMember.Member_Key 
+SELECT 
+  {
+    [Measures].[ConditionKey]
+   ,[Measures].[DrKey]
+   ,[Measures].[DrPatientKeyCnt]
+  } ON COLUMNS
+ ,Order
+  (
+    NonEmpty([DimPopulation].[Population Key].[Population Key]
+			,[Measures].[DrPatientKeyCnt])
+   ,[Measures].[DrPatientKeyCnt]
+   ,DESC
+  ) ON ROWS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimAnchorDate].[Date Key].&[20141031]
+   ,[DimReport].[Report Key].&[1]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//VENN DIAGRAM
+
+WITH SET FirstSet AS NonEmpty([DimPatient].[Patient Key].[Patient Key].MEMBERS
+							 ,([Measures].[DrPatientKeyCnt],[DimPopulation].[Population Key].&[190])) 
+	SET SecondSet AS NonEmpty([DimPatient].[Patient Key].[Patient Key].MEMBERS
+							 ,([Measures].[DrPatientKeyCnt],[DimPopulation].[Population Key].&[210])) 
+	SET ThirdSet AS NonEmpty([DimPatient].[Patient Key].[Patient Key].MEMBERS
+							 ,([Measures].[DrPatientKeyCnt],[DimPopulation].[Population Key].&[262])) 
+	MEMBER [1Ccnt]	  AS Count(FirstSet) 
+	MEMBER [2Ccnt]	  AS Count(SecondSet) 
+	MEMBER [3Ccnt]	  AS Count(ThirdSet) 
+	MEMBER [12Ccnt]	  AS Count(Intersect([FirstSet],[SecondSet])) 
+    MEMBER [13Ccnt]   AS Count(Intersect([FirstSet],[ThirdSet])) 
+    MEMBER [23Ccnt]   AS Count(Intersect([SecondSet],[ThirdSet])) 
+    MEMBER [123Ccnt]  AS Count(Intersect({Intersect([FirstSet],[SecondSet])},[ThirdSet])) 
+    MEMBER [Cname1]   AS [DimPopulation].[Population Key].&[190].Name 
+	MEMBER [Cname2]   AS [DimPopulation].[Population Key].&[210].Name 
+    MEMBER [Cname3]   AS [DimPopulation].[Population Key].&[262].Name 
+	MEMBER [Cname12]  AS [Cname1] + ', ' + [Cname2] 
+	MEMBER [Cname13]  AS [Cname1] + ', ' + [Cname3] 
+    MEMBER [Cname23]  AS [Cname2] + ', ' + [Cname3] 
+    MEMBER [Cname123] AS [Cname1] + ', ' + [Cname2] + ', ' + [Cname3] 
+SELECT 
+  {
+    [1Ccnt]
+   ,[2Ccnt]
+   ,[3Ccnt]
+   ,[12Ccnt]
+   ,[13Ccnt]
+   ,[23Ccnt]
+   ,[123Ccnt]
+   ,[Cname1]
+   ,[Cname2]
+   ,[Cname3]
+   ,[Cname12]
+   ,[Cname13]
+   ,[Cname23]
+   ,[Cname123]
+  } ON COLUMNS
+FROM PopulationReportCube
+WHERE 
+  (
+    [DimAnchorDate].[Date Key].&[20141031]
+   ,[DimReport].[Report Key].&[1]
+   ,{
+      [DimPopulation].[Population Key].&[190]
+     ,[DimPopulation].[Population Key].&[210]
+     ,[DimPopulation].[Population Key].&[262]
+    }
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Venn Diagram Drill down for  individual sets 
+
+WITH MEMBER [Measures].[DrList] 
+			AS Generate([DimPatientDr].[Population Key].[Population Key].MEMBERS
+					   ,IIF([Measures].[DrCnt] <> 0,[DimPatientDr].[Population Key].CurrentMember.Member_Caption+ ', ',NULL)) 
+	 MEMBER [Measures].[ProgramList] 
+			AS Generate([DimPatientProgram].[Program Key].[Program Key].MEMBERS
+					  ,IIF([Measures].[ProgramCnt] <> 0,[DimPatientProgram].[Program Key].CurrentMember.Member_Caption+ ', ',NULL)) 
+	 MEMBER PatientName   AS [DimPatient].[Full Name].CurrentMember.Member_Caption 
+	 MEMBER PatientAge	  AS [DimPatient].[Age].CurrentMember.Member_Caption 
+	 MEMBER PatientGender AS [DimPatient].[Gender].CurrentMember.Member_Caption 
+	 MEMBER PatientMRN    AS [DimPatient].[Medical Record Number].CurrentMember.Member_Caption 
+	 MEMBER PatientPhone  AS [DimPatient].[Phone No].CurrentMember.Member_Caption 
+	 MEMBER Patientkey    AS [DimPatient].[Patient Key].CurrentMember.Member_Caption 
+	 MEMBER [Measures].[PCPList] 
+			AS Generate([DimPatientPCP].[Provider Key].[Provider Key].MEMBERS
+						,IIF([Measures].[PCPCnt] <> 0,[DimPatientPCP].[Provider Key].CurrentMember.Member_Caption+ ', ',NULL))    
+SELECT 
+  SubSet
+  (
+    NonEmpty([DimPatient].[Patient Key].[Patient Key]
+			,{[Measures].[DrPatientKeyCnt]})
+   ,0
+   ,10
+  ) ON ROWS
+ ,{
+    [Measures].[Patientkey]
+   ,[Measures].[PatientName]
+   ,[Measures].[PatientAge]
+   ,[Measures].[PatientGender]
+   ,[Measures].[PatientMRN]
+   ,[Measures].[PatientPhone]
+   ,[Measures].[DrCnt]
+   ,[Measures].[PCPList]
+   ,[Measures].[DrList]
+   ,[Measures].[ProgramList]
+  } ON COLUMNS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].&[1]
+   ,[DimAnchorDate].[Date Key].&[20141031]
+   ,[DimPopulation].[Population key].&[210]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Venn Diagram Drill down for  combination of 2 sets 
+
+
+WITH 
+  SET FirstSet AS NonEmpty([DimPatient].[Patient Key].[Patient Key].MEMBERS
+						 ,([Measures].[DrPatientKeyCnt],[DimPopulation].[Population Key].&[190])) 
+  SET SecondSet AS NonEmpty([DimPatient].[Patient Key].[Patient Key].MEMBERS
+						 ,([Measures].[DrPatientKeyCnt],[DimPopulation].[Population Key].&[262])) 
+
+  MEMBER [Measures].[DrList] 
+		 AS Generate([DimPatientDr].[Population Key].[Population Key].MEMBERS
+					,IIF([Measures].[DrCnt] <> 0,[DimPatientDr].[Population Key].CurrentMember.Member_Caption+ ', ',NULL)) 
+  MEMBER [Measures].[ProgramList] 
+		 AS Generate([DimPatientProgram].[Program Key].[Program Key].MEMBERS
+					,IIF([Measures].[ProgramCnt] <> 0,[DimPatientProgram].[Program Key].CurrentMember.Member_Caption+ ', ',NULL)) 
+  MEMBER PatientName AS  [DimPatient].[Full Name].CurrentMember.Member_Caption 
+  MEMBER PatientAge  AS [DimPatient].[Age].CurrentMember.Member_Caption 
+  MEMBER PatientGender AS [DimPatient].[Gender].CurrentMember.Member_Caption 
+  MEMBER PatientMRN AS [DimPatient].[Medical Record Number].CurrentMember.Member_Caption 
+  MEMBER PatientPhone AS [DimPatient].[Phone No].CurrentMember.Member_Caption 
+  MEMBER Patientkey AS [DimPatient].[Patient Key].CurrentMember.Member_Caption 
+  MEMBER [Measures].[PCPList] 
+		 AS Generate([DimPatientPCP].[Provider Key].[Provider Key].MEMBERS
+					,IIF([Measures].[PCPCnt] <> 0,[DimPatientPCP].[Provider Key].CurrentMember.Member_Caption+ ', ',NULL))    
+ 
+SELECT 
+  SubSet
+  (
+   Intersect([FirstSet],[SecondSet])
+   ,0
+   ,10
+  ) ON ROWS
+ ,{
+    [Measures].[Patientkey]
+   ,[Measures].[PatientName]
+   ,[Measures].[PatientAge]
+   ,[Measures].[PatientGender]
+   ,[Measures].[PatientMRN]
+   ,[Measures].[PatientPhone]
+   ,[Measures].[DrCnt]
+   ,[Measures].[PCPList]
+   ,[Measures].[DrList]
+   ,[Measures].[ProgramList]
+  } ON COLUMNS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].&[1]
+   ,[DimAnchorDate].[Date Key].&[20141031]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Venn Diagram Drill down for  combination of 3 sets 
+
+WITH 
+  SET FirstSet  AS NonEmpty([DimPatient].[Patient Key].[Patient Key].MEMBERS	
+						 ,([Measures].[DrPatientKeyCnt],[DimPopulation].[Population Key].&[190]))
+  SET SecondSet AS NonEmpty([DimPatient].[Patient Key].[Patient Key].MEMBERS
+						  ,([Measures].[DrPatientKeyCnt],[DimPopulation].[Population Key].&[210]))    
+  SET ThirdSet AS NonEmpty([DimPatient].[Patient Key].[Patient Key].MEMBERS
+						 ,([Measures].[DrPatientKeyCnt],[DimPopulation].[Population Key].&[262])) 
+
+  MEMBER [Measures].[DrList] 
+		 AS Generate([DimPatientDr].[Population Key].[Population Key].MEMBERS
+					,IIF([Measures].[DrCnt] <> 0 ,[DimPatientDr].[Population Key].CurrentMember.Member_Caption+ ', ',NULL)) 
+  MEMBER [Measures].[ProgramList] 
+		 AS Generate([DimPatientProgram].[Program Key].[Program Key].MEMBERS
+					,IIF([Measures].[ProgramCnt] <> 0,[DimPatientProgram].[Program Key].CurrentMember.Member_Caption+ ', ',NULL)) 
+  MEMBER PatientName AS   [DimPatient].[Full Name].CurrentMember.Member_Caption 
+  MEMBER PatientAge  AS   [DimPatient].[Age].CurrentMember.Member_Caption 
+  MEMBER PatientGender AS [DimPatient].[Gender].CurrentMember.Member_Caption 
+  MEMBER PatientMRN AS [DimPatient].[Medical Record Number].CurrentMember.Member_Caption 
+  MEMBER PatientPhone AS  [DimPatient].[Phone No].CurrentMember.Member_Caption 
+  MEMBER Patientkey AS [DimPatient].[Patient Key].CurrentMember.Member_Caption 
+  MEMBER [Measures].[PCPList] 
+		 AS Generate([DimPatientPCP].[Provider Key].[Provider Key].MEMBERS
+					,IIF([Measures].[PCPCnt] <> 0,[DimPatientPCP].[Provider Key].CurrentMember.Member_Caption+ ', ',NULL))    
+ 
+SELECT 
+  SubSet
+  (
+   Intersect({Intersect([FirstSet],[SecondSet])},[ThirdSet])
+   ,0
+   ,10
+  ) ON ROWS
+ ,{
+    [Measures].[Patientkey]
+   ,[Measures].[PatientName]
+   ,[Measures].[PatientAge]
+   ,[Measures].[PatientGender]
+   ,[Measures].[PatientMRN]
+   ,[Measures].[PatientPhone]
+   ,[Measures].[DrCnt]
+   ,[Measures].[PCPList]
+   ,[Measures].[DrList]
+   ,[Measures].[ProgramList]
+  } ON COLUMNS
+FROM [PopulationReportCube]
+WHERE 
+  (
+    [DimReport].[Report Key].&[1]
+   ,[DimAnchorDate].[Date Key].&[20141031]
+  );
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
