@@ -1,33 +1,30 @@
-Influence Health is chronic care managemet sytem which can be used for reducing the risk rate in health care and decrease readmission of patients in hospital
-we can find the risklvel by performing daiagnosis cpt code
-we fill find the daiganosis through creiteria we called it as population definition 
-Mainly in our apllciation  we have four modules caramanger admin carteammember provider
+Currently iam working as a healthcare product. Using this project able to manage chronic patients in USA.
 
+This product name is IH.
 
-
+Influence Health (formerly MEDSEEK) provides digital marketing and patient engagement solutions to help you influence patients well 
+beyond the care setting.
 
 Influence Health is a care management system that enables providers(Physicians) to identify, 
 manage and engage low-risk, rising-risk and high-risk patients to prevent hospital readmissions, 
 eliminate gaps in care.
 
 
+The main purpose of the product is reducing the risk rate in health care and decrease readmission of patients in hospitals.
 
 
-Influence Health (formerly MEDSEEK) provides digital marketing and patient engagement solutions to help you influence patients well beyond the care setting.
-
-Navigate is a comprehensive care management system that enables providers to identify, manage and engage low-risk, rising-risk and high-risk patients to prevent hospital readmissions, eliminate gaps in care, and lessen financial risks associated with emerging value-based payment plans. 
-
-Navigate program will identify high-risk and expensive chronic conditions in Medicaid as they emerge. The idea is to match the enrolled, ensuring that those patients will get faster and more appropriate care and save the state money in the process. The care team will use modern "predictive modeling" based on defined criteria to select candidates for enrolment in the program. Based on condition the patient selection will happen. 
+Mainly in our apllciation  we have four modules caramanger admin carteammember provider
 
 A group of patients having the care team and each care team has members and managers to take care of the patient’s activity.
 
-This is a healthcare product. Using this project able to manage chronic patients in USA.
-
 In this product having thousand plus tables, sored procedure, view’s and triggers  
 
-There are six types of roles in this application like admin, care manager, Clinic Admin, Physician, care team member, and Patient. This product is pure configurable. 
-Using this product able to manage patient demographics, Claim, Labs, Rx claim, Medication, Encounter, and related data using codes LOINC, ICD 9, CPT 9 and 10, Drug Codes etc.
+There are six types of roles in this application like admin, care manager, Clinic Admin, Physician, care team member, and Patient. 
+This product is pure configurable. 
+Using this product able to manage patient demographics, Claim, Labs, Rx claim, Medication, Encounter, and related data using codes 
+LOINC, ICD 9, CPT 9 and 10, Drug Codes etc.
 Admin will be able to manage whole application as well as all configuration part.
+
 Care provider have group of team like care manger, doctor, nurses etc.
 
 Care manager will able to manage all team member and patient data like Dr. Visit, drug encounter, health check, questioner, hospital visit, schedule and encounter etc.
