@@ -321,5 +321,9 @@ Connection Managers Available for Download
    When the Package’s execution is completed and stopped in BIDS,the deployed package will be deleted and this is called as 
    Design Time Deployment.   
    
+• Difference between Merge and Merge Join Transformation.
+    Merge is a combining sorted data from 2 data sources..it is similar to union all but the data coming from sources must be sorted .
+    Where as Merge join, similar to that of SQL joins, is used to join the data sources based on a column (columns).
+   
    
    
