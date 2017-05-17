@@ -1,0 +1,3 @@
+1. Example for DECIMAL: -
+   DECIMAL(18,4)
+   That gives you a total of 18 digits, 4 of which after the decimal point (and 14 before the decimal point).
