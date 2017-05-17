@@ -1,1 +1,9 @@
+1. Report Deployment using RS utility
+   RS.exe is a command prompt utility that Processes script you provide in an input file (.rss). 
+   We use this utility to automate report server deployment and administration tasks.
+ 
+   RSS file: The .rss file contain the code to read the report item  file from the local system, upload the file to report server and set data source. We can write .rss file using Visual Basi.net.
 
+  Below is the syntax for RS.exe
+
+  rs –i c:\ReportDepolyment\RSDeploy.rss -s http://localhost/reportserver
