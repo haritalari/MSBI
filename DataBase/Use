@@ -23,7 +23,7 @@
 23. How to detect READ_COMMITTED_SNAPSHOT is enabled? (https://stackoverflow.com/questions/51969/how-to-detect-read-committed-snapshot-is-enabled)
 24. Use a LIKE statment on SQL Server XML Datatype (https://stackoverflow.com/questions/1832987/use-a-like-statment-on-sql-server-xml-datatype)
 25. How to get the middle word using Substring via Charindex of Second Position? (https://stackoverflow.com/questions/44242494/how-to-get-the-middle-word-using-substring-via-charindex-of-second-position)
-26. 
+26. HangFire Tables (https://github.com/HangfireIO/Hangfire/blob/master/src/Hangfire.SqlServer/Install.sql)
 
 
 
