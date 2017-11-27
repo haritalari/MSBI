@@ -2,3 +2,9 @@ SQL Fragmentation
     https://www.idera.com/productssolutions/sqlserver/sqldefragmanager/what-is-fragmentation
     https://www.toptal.com/sql/interview-questions
     
+    
+1. SQL Server Management Studio (SSMS):- is the client tool that can be used to write and execute SQL queries. 
+        Server type = Database Engine/Analysis Services/Reporting Services/Integration Services
+        Server name = server name/IP Address/127.0.0.1/.(dot)/localhost
+        Authentication = Windows Authentication and SQL Server Authentication (Require UserName and Password)
+    
