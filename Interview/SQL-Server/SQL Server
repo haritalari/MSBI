@@ -7,4 +7,6 @@ SQL Fragmentation
         Server type = Database Engine/Analysis Services/Reporting Services/Integration Services
         Server name = server name/IP Address/127.0.0.1/.(dot)/localhost
         Authentication = Windows Authentication and SQL Server Authentication (Require UserName and Password)
-    
+ 2. FillFactor: - Fill factor is the value that determines the percentage of space on each leaf-level page to be filled with data. 
+    In an SQL Server, the smallest unit is a page, which is made of  Page with size 8K. Every page can store one or more rows 
+    based on the size of the row. The default value of the Fill Factor is 100, which is same as value 0. 
