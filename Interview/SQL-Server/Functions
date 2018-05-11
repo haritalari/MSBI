@@ -1,0 +1,32 @@
+User-Defined Functions:- There are three types of User-Defined functions in SQL Server,They are 
+    1.	Scalar function (FN)
+    2.	Inline Table-Valued function (IF)
+    3.	Multi-statement Table-valued function (TF)
+
+1.	Scalar function (FN): - Scalar functions return a single data value of the type defined in the RETURNS clause. 
+The return type can be any data type except text, ntext, image, cursor, and timestamp.
+    Example:- 
+             CREATE FUNCTION whichContinent (@Country NVARCHAR(15))
+             RETURNS VARCHAR(30)
+             AS
+             BEGIN
+             DECLARE @Return varchar(30)
+             SELECT @return = case @Country
+                      WHEN 'Argentina' THEN 'South America'
+                      WHEN 'Belgium' THEN 'Europe'
+                      ELSE 'Unknown' END
+             RETURN @return
+             END
+
+             --Calling a Scalar Function
+                SELECT DBO.whichContinent('India') AS Country
+            
+              CREATE TABLE Test(
+               Country VARCHAR(15),
+               Continent AS (dbo.WhichContinent(Country)))
+
+              INSERT INTO Test (Country) VALUES ('USA')
+
+              SELECT * FROM Test
+        ---------------------------------------------------------------------------------------------------------------------              
+
