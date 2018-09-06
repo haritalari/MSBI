@@ -7,6 +7,67 @@ SQL Fragmentation
         Server type = Database Engine/Analysis Services/Reporting Services/Integration Services
         Server name = server name/IP Address/127.0.0.1/.(dot)/localhost
         Authentication = Windows Authentication and SQL Server Authentication (Require UserName and Password)
+        
+2. System Databases:- System databases are an integral part of the SQL Server product as it depends on the System Databases 
+   to function. The following are the system databases of sql server.
+    Master Database:- 
+    The Master database basically consists of two physical files, namely master.mdf (data file) and mastlog.ldf (log file). 
+    If master database is corrupted or if it is not available then the SQL Server Service will not start.This database consists 
+    of all the user created database releated information will be stored.
+    Model Database:- 
+    The Model database basically consists of two physical files namely Model.mdf (data file) and ModelLog.ldf (log file). 
+    If the Model database is damaged or corrupted then SQL Server Service will not start up as it will not be able 
+    to create the tempdb database. 
+    MSDB Database:-
+    The MSDB database basically consists of two physical files namely MSDBData.mdf (data file) and MSDBLog.ldf (log file). 
+    If the MSDB database is corrupted or damaged then scheduling information used by SQL Server Agent will be lost. 
+    TempDB Database:-
+    The TempDB database basically consists of two physical files namely tempdb.mdf (data file) and templog.ldf (log file). 
+    If this database is corrupted or damaged we will not be able to temparory tables.
+    Resource Database:-
+    The physical file names of Resource database is mssqlsystemresource.mdf and mssqlsystemresource.ldf. 
+    ReportServer:-
+    The ReportServer database is created when a user installs SQL Server Reporting Service. This database basically stores 
+    all the metadata and object related information which is used by reporting services.The ReportServer database basically 
+    consists of two physical files namely ReportServer.mdf (data file) and ReportServer_log.ldf (log file). 
+    ReportServerTempDB:-
+    The ReportServerTempDB database basically consists of two physical files namely ReportServerTempDB.mdf (data file) and 
+    ReportServerTempDB_log.ldf (log file). 
+    Distribution:- 
+    The distribution database basically consists of two physical files namely distribution.mdf (data file) and 
+    distribution_log.ldf (log file). By default when you are configuring replication the distribution database related data 
+    and log file are created. 
+    
+ 3. Database:
+    A database is a collection of information that is organized so that it can be easily accessed, managed and updated.
+    A maximum of 32,767 databases can be specified on a server.
+    There are three types of files used to store a database: 
+    	The primary file contains the startup information for the database. The primary file is also used to store data. 
+         Every database has one primary file.
+    	Secondary files hold all of the data that does not fit in the primary data file. Databases need not have any 
+         secondary data files if the primary file is large enough to hold all of the data in the database. 
+         Other databases may be large enough to need multiple secondary data files, or they may use secondary files on 
+         separate disk drives to spread the data across multiple disks.
+    	Transaction log files hold the log information used to recover the database. There must be at least one 
+         transaction log file for each database, although there may be more than one. The minimum size for a 
+         transaction log file is 512 KB. 
+    Every database has at least two files, a primary file and a transaction log file.
+    Database Files Extensions:- Primary data file(.mdf), Secondary data file(.ndf), Transaction log file(.ldf)
+
+4. Datatypes:-Data types in SQL Server are organized into the following categories: and their bytes
+        Exact numerics (bigint-8,int-4,smallint-2,tinyint-1,bit-1 bit,decimal,numeric,money-8,smallmoney-4)
+        Approximate numerics (Float-4 for 7 digit precision and 8 for 15 digit precision ,real-4)
+        Date and time (datetime-two 4 byte integers,smalldatetime-Two 2 byte intergers)
+        Character strings(char-Each char occupies 1 byte,varchar,text)
+        Unicode character strings (nchar-Each nchar occupies 2 bytes,nvarchar,ntext)
+        Binary strings (binary,varbinary,image)
+        Other data types(cursor,sql_variant,table,timestamp,uniqueidentifier)
+        
+    
+
+
+    
+        
  2. FillFactor: - Fill factor is the value that determines the percentage of space on each leaf-level page to be filled with data. 
     In an SQL Server, the smallest unit is a page, which is made of  Page with size 8K. Every page can store one or more rows 
     based on the size of the row. The default value of the Fill Factor is 100, which is same as value 0. 
