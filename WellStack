@@ -1,0 +1,26 @@
+Puropse:-
+Metric Builder
+
+Population management starts with an assessment of the entire risk-based population, in order to identify the specific definition 
+on which the organization chooses to focus: high risk patients, those with specific chronic disease, and those in need of 
+appropriate screenings and primary prevention interventions. Metric Builder helps in reporting the performance of a particular cohort. 
+This evaluation and reporting generate actionable insights for various individuals/teams across the care continuum, 
+which eventually leads to better quality of life for the patient. Metric Builder is built on SymphonyCare data vault 
+and empowers users in coming up with complex queries within minutes via an easy to use interface. Users can input demographic, 
+clinical and utilization criteria to identify specific populations of patients, share population definitions with other users, 
+and download detailed information on these populations. Below are the functionalities in Metric Builder.
+
+  >Metric Builder
+      o	Process  Metric
+      o	Outcome Metric
+  	Denominator Criteria’s
+      o	Patient Information
+      o	Medical Information
+      o	Medication Information
+      o	Lab & Procedure Details
+      o	Utilization Details
+      o	Criteria Sets
+      o	Build Definition
+  	Numerator Criteria’s
+      o	Criteria sets (As per denominator criteria)
+      o	Build Definition
