@@ -1,3 +1,6 @@
+Navigate Project:-
+-------------------
+
 Currently iam working as a healthcare product. Using this project able to manage chronic patients in USA.
 
 This product name is IH.
@@ -30,3 +33,42 @@ Care provider have group of team like care manger, doctor, nurses etc.
 Care manager will able to manage all team member and patient data like Dr. Visit, drug encounter, health check, questioner, hospital visit, schedule and encounter etc.
 
 Analytical report – HEDIS, PQRS, Comorbidity, Condition Prevalence, Utilization, advance comparison, Patient longitudinal View, Care Management Metric etc.
+
+
+
+WellStack Project:-
+----------------------
+Wellstack is Analaytical application which help to perform Anlaysis on poluplation 
+by using cohort & metric builder
+Here cohort means population definitin and metric means comibination of numerator/denominator
+
+Population definition means : Its criteria used to map the patient to a particular group
+while creating  pd when use tabs like : 
+	 Patient information -- patient demographics like age,,dob,city,gender,
+	,Medical inforamtion -- condtions (ClaimInfo,ClaimLine,ClaimLineDiagnosis,CodeSetICDDiagnosis,ClaimCodeGroup)
+	,medication information - ClaimInfo,ClaimLine,ClaimLineDiagnosis,CodeSetICDDiagnosis,ClaimCodeGroup
+	,provider and utilization -- provider, patientpcp ,providerspeciality,claimcodegroup
+	,lab and Procedures - Patient,PatientMeasure,LabCodeGroup
+
+we have Codeset tables codeset icd diagnosis and icd procedures
+
+After adding all the respective attributes we can denominator create one sql crieria 
+which saves data in sql database. In the same process we can create numerator sql criteria  here in addition all we have 
+segments(good,poor,fair,not tested )
+
+Metric : Combination of numerator/denominator
+
+
+Responsibilities:
+
+Design, build and deploy effective SSIS packages
+Translate requirements from the business and analyst into technical code
+Identify and test for bugs and bottlenecks in the ETL solution
+Ensure the best possible performance and quality in the packages
+Provide support and fix issues in the packages
+Crafting and executing queries upon request for data.
+Presenting information through reports and visualization
+Troubleshoot performance issues
+Very good experience in having designed and developed reports, scorecards and dashboards
+Strong quantitative and analytical skills - ability to quickly analyze data to identify key insights and apply them to the business
+Develop a strong understanding of business requirements; working with business users/ business analysts to define technical and process requirements
