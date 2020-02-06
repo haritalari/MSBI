@@ -1,3 +1,22 @@
+1. Difference between EXEC(EXECUTE) or SP_EXECUTESQL
+    . Both are used for executing the sql statments in ther form of string.
+    . But SP_EXECUTESQL accepts Paratmers, EXEC will not accept.
+    . Only performance differences that may arise are due to the parameterisation 
+      i.e. a parameterised sp_executesql call is more likely to have a reusable cached plan. 
+      An EXEC call is likely to lead to lots of single use space wasters in the plan cache.
+
+2. Difference between Functions and Stored Procedures
+    User Defined Function	Stored Procedure
+Function must return a value.	Stored Procedure may or not return values.
+Will allow only Select statements, it will not allow us to use DML statements.	Can have select statements as well as DML statements such as insert, update, delete and so on
+It will allow only input parameters, doesn't support output parameters.	It can have both input and output parameters.
+It will not allow us to use try-catch blocks.	For exception handling we can use try catch blocks.
+Transactions are not allowed within functions.	Can use transactions within Stored Procedures.
+We can use only table variables, it will not allow using temporary tables.	Can use both table variables as well as temporary table in it.
+Stored Procedures can't be called from a function.	Stored Procedures can call functions.
+Functions can be called from a select statement.	Procedures can't be called from Select/Where/Having and so on statements. Execute/Exec statement can be used to call/execute Stored Procedure.
+A UDF can be used in join clause as a result set.	Procedures can't be used in Join clause
+
 SQL Fragmentation
     https://www.idera.com/productssolutions/sqlserver/sqldefragmanager/what-is-fragmentation
     https://www.toptal.com/sql/interview-questions
